@@ -1,0 +1,1481 @@
+# AI PAYMENT GUARDIAN
+## Master Project Blueprint and Development Instructions
+
+**Project Name:** AI Payment Guardian  
+**Project Type:** AI-Powered Personal Finance and Payment Management Agent  
+**Development Approach:** Six-Phase Incremental Development  
+**Platforms:** Web and Mobile  
+**AI Autonomy:** Approval-Based Agent  
+**Financial Data Source:** Bank Integration  
+**Architecture:** Modular Monolithic Architecture  
+
+---
+
+# 1. PROJECT OVERVIEW
+
+AI Payment Guardian is an AI-powered financial management application designed to help users monitor their bank accounts, understand their spending patterns, manage upcoming payments, predict their future financial balance and make informed financial decisions.
+
+The application should work as an intelligent personal financial assistant.
+
+Instead of requiring users to manually analyse their transactions, calculate upcoming expenses and remember payment dates, AI Payment Guardian should analyse authorised financial data and provide meaningful insights, recommendations and timely alerts.
+
+The system should have two interfaces:
+
+1. Web Application.
+2. Mobile Application.
+
+Both applications must communicate with the same backend and database. Financial information, user preferences, transactions, bills, AI conversations and approval records must remain synchronised across both platforms.
+
+The application must be simple, intuitive and user-friendly. It should not overwhelm users with excessive charts, unnecessary information or complicated navigation.
+
+The primary objective is to build a reliable AI financial assistant that can understand a user's financial situation and assist with financial management while keeping the user in control of important decisions.
+
+---
+
+# 2. FINALIZED PROJECT DECISIONS
+
+The following decisions are finalized and must be treated as project requirements.
+
+| Component | Selected Technology / Decision |
+|---|---|
+| Web frontend | React.js |
+| Mobile frontend | React Native with Expo |
+| Backend | Python with FastAPI |
+| Database | PostgreSQL |
+| AI integration | LLM-based AI agent |
+| Financial calculations | Python-based deterministic services |
+| Background processing | Redis and Celery |
+| Containerization | Docker |
+| Version control | Git and GitHub |
+| CI/CD | GitHub Actions |
+| Bank data | Consent-based bank integration |
+| Agent autonomy | Approval required for consequential actions |
+| Architecture | Modular monolithic architecture |
+
+Do not introduce alternative frameworks or technologies without first explaining why the existing architecture cannot satisfy a requirement.
+
+Do not unnecessarily increase project complexity.
+
+---
+
+# 3. PROJECT OBJECTIVES
+
+The application must achieve the following objectives.
+
+1. Allow users to securely register and access their accounts.
+2. Connect users' bank accounts through an authorised integration.
+3. Retrieve and organise financial information.
+4. Display account balances and transaction history.
+5. Identify income and expense patterns.
+6. Detect recurring payments and subscriptions.
+7. Maintain upcoming payment schedules.
+8. Calculate projected account balances.
+9. Identify potential financial risks.
+10. Provide AI-powered financial explanations.
+11. Recommend appropriate payment priorities.
+12. Generate timely reminders and alerts.
+13. Prepare proposed financial actions.
+14. Request user approval before consequential actions.
+15. Maintain a history of recommendations, approvals and actions.
+
+The application must never pretend that a simulated operation is a real bank transaction.
+
+During development, mock financial data may be used, but it must always be clearly identified as mock data.
+
+---
+
+# 4. CORE FUNCTIONALITIES
+
+## 4.1 User Management
+
+The system must support:
+
+- User registration.
+- User login and logout.
+- Secure authentication.
+- User profile management.
+- Password management.
+- User preferences.
+- Session management.
+- Account deletion and data management.
+
+Each user must only be able to access their own financial information.
+
+## 4.2 Bank Account Management
+
+The system must support:
+
+- Connecting bank accounts.
+- Viewing connected accounts.
+- Displaying account information.
+- Retrieving authorised account information.
+- Synchronising financial data.
+- Displaying the last synchronisation time.
+- Handling expired or revoked consent.
+- Disconnecting bank accounts.
+
+Bank integration must be implemented through a provider-independent adapter.
+
+For the Indian banking ecosystem, investigate the Account Aggregator framework and suitable authorised integration partners.
+
+Do not collect or store internet-banking passwords, UPI PINs, OTPs, CVVs or card PINs.
+
+## 4.3 Transaction Management
+
+The system must:
+
+- Retrieve authorised transactions.
+- Display transaction details.
+- Identify income and expenses.
+- Categorise transactions.
+- Allow users to correct categories.
+- Identify recurring transactions.
+- Detect potential duplicate transactions.
+- Support transaction filtering.
+- Maintain transaction history.
+
+## 4.4 Bill and Subscription Management
+
+The system must:
+
+- Identify recurring payment patterns.
+- Allow manual bill creation.
+- Maintain bill due dates.
+- Identify subscription payments.
+- Display upcoming payments.
+- Track payment status.
+- Generate reminders.
+- Identify subscriptions that may require user review.
+
+Do not automatically assume that every repeated transaction is a confirmed subscription.
+
+## 4.5 Financial Intelligence
+
+The system must:
+
+- Calculate income.
+- Calculate expenses.
+- Calculate available balances using the latest valid information.
+- Analyse spending patterns.
+- Identify unusual transactions.
+- Estimate upcoming expenses.
+- Forecast future balances.
+- Identify potential low-balance situations.
+- Explain financial risks.
+
+All authoritative financial calculations must be performed by deterministic backend services rather than relying on LLM-generated arithmetic.
+
+## 4.6 AI Financial Assistant
+
+The AI assistant must:
+
+- Understand user questions.
+- Retrieve authorised financial information.
+- Explain spending patterns.
+- Explain upcoming payments.
+- Answer balance-related questions.
+- Explain financial forecasts.
+- Identify potential cash-flow problems.
+- Recommend payment priorities.
+- Generate actionable suggestions.
+- Ask clarifying questions when information is insufficient.
+
+The AI must never invent transactions, account balances, payment confirmations or financial information.
+
+## 4.7 Payment Approval System
+
+The AI agent must be able to prepare proposed actions, but it must not independently execute consequential financial actions.
+
+The user must explicitly approve every consequential action.
+
+The approval process must display:
+
+- Action description.
+- Amount.
+- Destination or payee, where applicable.
+- Source account, where applicable.
+- Proposed date.
+- Reason for the recommendation.
+- Relevant conditions.
+
+If any important action detail changes, the previous approval must become invalid.
+
+If an authorised payment integration is unavailable, the application should provide a safe reminder or hand-off instead of simulating payment execution.
+
+---
+
+# 5. SYSTEM ARCHITECTURE
+
+Implement a modular monolithic architecture.
+
+The web application and mobile application must share a centralized backend.
+
+### Architecture Flow
+
+Web Application (React)
+             |
+             |
+Mobile Application (React Native)
+             |
+             |
+         FastAPI Backend
+             |
+   ---------------------------
+   |       |       |         |
+ Auth   Banking   AI     Analytics
+   |       |       |         |
+   ---------------------------
+             |
+       PostgreSQL
+             |
+       Redis / Celery
+             |
+   Background Processing
+             |
+ Authorised Bank Provider
+
+### Frontend Responsibilities
+
+The frontend must handle:
+
+- User interface.
+- Navigation.
+- Authentication screens.
+- Dashboard.
+- Financial data presentation.
+- Transaction management.
+- Bill management.
+- AI assistant interface.
+- Notification centre.
+- Approval interface.
+- User settings.
+
+The frontend must not independently calculate authoritative financial balances or make direct bank-provider requests.
+
+### Backend Responsibilities
+
+The backend must handle:
+
+- Authentication and authorisation.
+- Financial data processing.
+- Bank integration.
+- Transaction management.
+- Database operations.
+- Financial calculations.
+- Forecast generation.
+- AI agent orchestration.
+- Notification management.
+- Approval validation.
+- Action execution through authorised providers.
+- Audit logging.
+
+### Database Responsibilities
+
+PostgreSQL must store:
+
+- User information.
+- Account metadata.
+- Bank connection references.
+- Consent records.
+- Transactions.
+- Categories.
+- Bills.
+- Subscriptions.
+- Forecasts.
+- Financial insights.
+- AI conversations.
+- Notifications.
+- Approval records.
+- Action records.
+- Audit events.
+
+All user-owned data must be associated with the appropriate user identifier.
+
+---
+
+# 6. SIX-PHASE DEVELOPMENT PLAN
+
+The complete project must be developed through six independent but interconnected phases.
+
+Each phase must build upon the previous phase.
+
+Do not skip required dependencies or implement future-phase functionality prematurely.
+
+## PHASE 1 — PROJECT FOUNDATION AND AUTHENTICATION
+
+### Objective
+
+Establish the project infrastructure, configure all development environments and implement secure user authentication.
+
+### Frontend Development
+
+Create the React web application and React Native mobile application.
+
+Implement:
+
+1. Project entry points.
+2. Navigation structure.
+3. Common UI components.
+4. Responsive layouts.
+5. Welcome screen.
+6. Registration screen.
+7. Login screen.
+8. Dashboard layout.
+9. Profile screen.
+10. Settings screen.
+11. Loading and error states.
+
+### Backend Development
+
+Implement:
+
+1. FastAPI application.
+2. API routing.
+3. Database connection.
+4. Environment configuration.
+5. Authentication services.
+6. User management.
+7. Password hashing.
+8. Token/session management.
+9. Authentication middleware or dependencies.
+10. Centralised exception handling.
+
+### Database Development
+
+Create:
+
+- Users.
+- User preferences.
+- Authentication/session records.
+
+Use database migrations.
+
+### Security Requirements
+
+- Never store plain-text passwords.
+- Protect private API endpoints.
+- Validate incoming data.
+- Protect authentication tokens.
+- Store secrets in environment variables.
+- Enforce user-level data isolation.
+
+### Completion Criteria
+
+Phase 1 is complete when:
+
+- Both frontend applications start successfully.
+- Backend starts successfully.
+- PostgreSQL connection works.
+- Users can register and log in.
+- Authentication works correctly.
+- Protected endpoints reject unauthenticated requests.
+- Both applications communicate with the backend.
+
+### Expected Deliverable
+
+A working web and mobile application with secure authentication and a centralized backend.
+
+---
+
+## PHASE 2 — BANK INTEGRATION AND FINANCIAL DATA MANAGEMENT
+
+### Objective
+
+Establish the financial data infrastructure and implement account, transaction, bill and subscription management.
+
+This phase must create the reliable financial data foundation required by the intelligence and AI systems.
+
+### Bank Integration
+
+Implement:
+
+1. Bank provider adapter.
+2. Mock bank provider for development.
+3. Bank connection workflow.
+4. Consent management.
+5. Account information retrieval.
+6. Transaction synchronisation.
+7. Synchronisation status.
+8. Error handling.
+9. Consent expiry handling.
+10. Consent revocation.
+
+The provider adapter must allow a legitimate bank-data provider to be integrated without rewriting the financial management modules.
+
+### Transaction Management
+
+Implement:
+
+- Transaction retrieval.
+- Transaction storage.
+- Transaction categorisation.
+- Transaction filtering.
+- Transaction history.
+- Duplicate detection.
+- Income identification.
+- Expense identification.
+- Manual transaction entry.
+
+### Bill Management
+
+Implement:
+
+- Bill creation.
+- Bill editing.
+- Bill deletion.
+- Due-date management.
+- Payment status.
+- Upcoming bill identification.
+- Recurring bill management.
+
+### Subscription Management
+
+Implement:
+
+- Subscription identification.
+- Subscription creation.
+- Subscription editing.
+- Subscription history.
+- Recurring payment tracking.
+- Subscription reminders.
+
+### Frontend Screens
+
+- Bank connection screen.
+- Connected accounts screen.
+- Transaction dashboard.
+- Transaction details.
+- Bill management.
+- Subscription management.
+- Upcoming payments calendar.
+- Synchronisation status.
+
+### Database Entities
+
+- Bank connections.
+- Bank consents.
+- Financial accounts.
+- Transactions.
+- Transaction categories.
+- Bills.
+- Subscriptions.
+- Synchronisation jobs.
+
+### Completion Criteria
+
+- Users can view their connected accounts.
+- Transactions are retrieved or loaded from mock providers.
+- Duplicate transactions are prevented.
+- Bills and subscriptions can be managed.
+- Synchronisation status is visible.
+- Financial records are correctly associated with their owners.
+- Consent revocation prevents further unauthorised synchronisation.
+
+### Expected Deliverable
+
+A functional financial data management system.
+
+---
+
+## PHASE 3 — FINANCIAL INTELLIGENCE AND PREDICTION ENGINE
+
+### Objective
+
+Transform the financial records obtained in Phase 2 into meaningful financial intelligence.
+
+This phase introduces the core analytical engine that will later support the AI agent.
+
+### Financial Analysis
+
+Implement:
+
+1. Total income calculation.
+2. Total expense calculation.
+3. Monthly financial summaries.
+4. Category-wise expense analysis.
+5. Spending trends.
+6. Recurring payment analysis.
+7. Financial history analysis.
+
+### Cash Flow Prediction
+
+Implement:
+
+1. Upcoming expense calculation.
+2. Expected income calculation.
+3. Projected balance calculation.
+4. Daily cash-flow projections.
+5. Weekly financial forecasts.
+6. Monthly financial forecasts.
+7. Low-balance prediction.
+
+### Risk Detection
+
+Implement:
+
+- Potential unusual spending detection.
+- Possible duplicate transaction detection.
+- Upcoming payment conflicts.
+- Potential insufficient-balance warnings.
+- Unusual changes in spending patterns.
+- Unreviewed recurring payments.
+
+### Intelligence Engine Design
+
+Use deterministic Python services for calculations and financial rules.
+
+The engine must receive financial records and generate structured insights.
+
+Example:
+
+Input:
+- Current available balance.
+- Upcoming bills.
+- Expected income.
+- Recent spending history.
+
+Output:
+- Projected balance.
+- Expected expenses.
+- Potential financial risks.
+- Relevant warnings.
+- Explanations and supporting records.
+
+### Frontend Screens
+
+- Financial overview.
+- Spending analysis.
+- Cash-flow forecast.
+- Upcoming payment insights.
+- Risk notifications.
+- Financial reports.
+
+### Completion Criteria
+
+- Calculations are accurate.
+- Forecasts are reproducible.
+- Historical records are considered appropriately.
+- Predictions clearly identify their assumptions.
+- Missing or outdated information is communicated.
+- Users can understand why an insight was generated.
+
+### Expected Deliverable
+
+A reliable financial intelligence and prediction engine.
+
+---
+
+## PHASE 4 — AI GUARDIAN AGENT AND RECOMMENDATION ENGINE
+
+### Objective
+
+Introduce the AI agent that acts as the user's intelligent financial assistant.
+
+The AI agent must use the financial data and intelligence services developed in earlier phases.
+
+### AI Agent Capabilities
+
+The agent must:
+
+1. Understand natural-language questions.
+2. Retrieve relevant user financial information.
+3. Analyse spending patterns.
+4. Explain financial summaries.
+5. Explain future balance predictions.
+6. Identify upcoming payment priorities.
+7. Identify potential financial risks.
+8. Generate personalised recommendations.
+9. Answer follow-up questions.
+10. Prepare proposed actions for user review.
+
+### Tool-Based Agent Architecture
+
+The AI agent must not have unrestricted access to the database.
+
+Instead, implement controlled backend tools.
+
+Example tools:
+
+- `get_account_summary`
+- `get_transaction_history`
+- `get_monthly_spending`
+- `get_upcoming_bills`
+- `get_subscription_summary`
+- `get_cashflow_forecast`
+- `get_financial_insights`
+- `create_action_proposal`
+
+Every tool must enforce user authentication, authorisation and input validation.
+
+### AI Agent Workflow
+
+User Question
+      |
+      v
+AI Intent Understanding
+      |
+      v
+Identify Required Information
+      |
+      v
+Call Authorised Backend Tools
+      |
+      v
+Retrieve Verified Financial Data
+      |
+      v
+Analyse and Interpret Results
+      |
+      v
+Generate Explanation or Recommendation
+      |
+      v
+Display Response to User
+
+### Example Questions
+
+- How much did I spend this month?
+- What payments are due this week?
+- Will I have enough balance after my upcoming payments?
+- Which subscriptions are recurring?
+- Why is my projected balance decreasing?
+- Which payments should I prioritise?
+- How much money can I safely spend based on my recorded commitments?
+
+### AI Recommendation Engine
+
+Recommendations must be based on:
+
+- Actual transaction history.
+- Confirmed upcoming bills.
+- Expected income records.
+- User preferences.
+- Financial forecasts.
+- Detected risks.
+
+The AI must explain why it makes a recommendation.
+
+### Frontend Screens
+
+- Ask Guardian.
+- Chat interface.
+- Recommendation cards.
+- Financial explanation screens.
+- Conversation history.
+
+### Security Requirements
+
+- AI must only access the authenticated user's data.
+- Do not expose unrestricted database access.
+- Validate all tool calls.
+- Treat retrieved financial data as untrusted input.
+- Protect against prompt injection.
+- Never allow AI-generated text alone to authorise payments.
+- Do not allow the AI to invent financial information.
+
+### Completion Criteria
+
+- Users can ask financial questions.
+- The AI retrieves the correct user's financial information.
+- The AI can explain Phase 3 predictions.
+- Recommendations have identifiable supporting information.
+- The agent cannot independently execute consequential actions.
+
+### Expected Deliverable
+
+A functional AI financial assistant with controlled tools and recommendation capabilities.
+
+---
+
+## PHASE 5 — INTELLIGENT ALERTS, APPROVAL WORKFLOW AND CONTROLLED ACTIONS
+
+### Objective
+
+Allow the AI agent to convert recommendations into proposed actions while ensuring that the user remains in control.
+
+This phase introduces the approval-based autonomy model.
+
+### Notification System
+
+Implement:
+
+1. Upcoming bill reminders.
+2. Payment due notifications.
+3. Low-balance warnings.
+4. Potential unusual-spending alerts.
+5. Subscription reminders.
+6. Financial forecast alerts.
+7. Action status notifications.
+
+### Approval Management
+
+The AI agent must be able to prepare an action proposal.
+
+Example:
+
+The AI identifies an upcoming payment and recommends that the user review it.
+
+It prepares a proposal containing:
+
+- Payment description.
+- Amount.
+- Payee.
+- Source account.
+- Proposed date.
+- Reason.
+- Supporting information.
+
+The user must explicitly approve or reject the proposal.
+
+### Approval Workflow
+
+AI Recommendation
+       |
+       v
+Prepare Action Proposal
+       |
+       v
+Validate Action Details
+       |
+       v
+Display Approval Request
+       |
+       v
+User Decision
+       |
+   -----------
+   |         |
+ Reject    Approve
+   |         |
+ Record    Revalidate
+ Decision    |
+             v
+       Execute Through
+       Authorised Provider
+             |
+             v
+       Record Final Status
+
+### Action Management
+
+Implement:
+
+- Action proposal creation.
+- Approval requests.
+- Approval history.
+- Rejection handling.
+- Expired approvals.
+- Action execution status.
+- Cancellation where supported.
+- Action audit records.
+- Duplicate execution protection.
+
+### Agent Autonomy Rules
+
+The agent may:
+
+- Analyse financial information.
+- Generate insights.
+- Recommend actions.
+- Prepare action proposals.
+- Generate reminders.
+- Schedule non-consequential background checks.
+
+The agent must not:
+
+- Independently transfer money.
+- Independently initiate consequential payments.
+- Change payment destinations without approval.
+- Change approved payment amounts without renewed approval.
+- Execute an action based on ambiguous user instructions.
+- Claim an action has succeeded without provider confirmation.
+
+### Frontend Screens
+
+- Notification centre.
+- Approval inbox.
+- Action review screen.
+- Approval confirmation.
+- Action history.
+- Notification settings.
+
+### Completion Criteria
+
+- Notifications are generated correctly.
+- Users can approve and reject proposals.
+- Approval is tied to exact action details.
+- Changed action details invalidate previous approval.
+- Duplicate actions are prevented.
+- All important actions are recorded.
+- Provider failures are communicated clearly.
+
+### Expected Deliverable
+
+A functional approval-based financial agent with safe and controlled action management.
+
+---
+
+## PHASE 6 — TESTING, SECURITY, DEPLOYMENT AND FINAL INTEGRATION
+
+### Objective
+
+Integrate all six-phase functionality into a reliable, secure and deployable product.
+
+### Testing
+
+Implement:
+
+- Unit testing.
+- Backend API testing.
+- Database integration testing.
+- Authentication testing.
+- Bank synchronisation testing.
+- Transaction processing testing.
+- Financial calculation testing.
+- Forecast testing.
+- AI tool permission testing.
+- Approval workflow testing.
+- Frontend testing.
+- Mobile application testing.
+- End-to-end testing.
+
+### Security
+
+Implement:
+
+- Secure authentication.
+- Authorisation checks.
+- Input validation.
+- User-level data isolation.
+- Rate limiting.
+- Secure session handling.
+- Secret management.
+- Sensitive data protection.
+- Audit logging.
+- Dependency security checks.
+- Secure error handling.
+
+### Docker
+
+Containerise the necessary services.
+
+The development environment should support:
+
+- Backend container.
+- PostgreSQL container.
+- Redis container.
+- Background worker container.
+- Web development environment where appropriate.
+
+Use Docker Compose for local development.
+
+### CI/CD
+
+Use GitHub Actions to automate:
+
+- Code quality checks.
+- Backend tests.
+- Frontend tests.
+- Build validation.
+- Deployment workflow.
+
+### Deployment
+
+Prepare:
+
+- Backend hosting.
+- Database hosting.
+- Web frontend deployment.
+- Mobile application builds.
+- Environment configurations.
+- Production logging.
+- Error monitoring.
+- Database backup strategy.
+
+### Documentation
+
+Maintain:
+
+- Project README.
+- Architecture documentation.
+- Database documentation.
+- API documentation.
+- Installation instructions.
+- Environment configuration.
+- AI agent documentation.
+- Security documentation.
+- Deployment instructions.
+
+### Completion Criteria
+
+- All six phases work together.
+- All critical tests pass.
+- No unresolved critical security issues remain.
+- Both applications communicate with the production backend.
+- Database migrations work correctly.
+- The application is deployable.
+- Project documentation is complete.
+
+### Expected Deliverable
+
+A complete, tested and deployable AI Payment Guardian application.
+
+---
+
+# 7. RECOMMENDED PROJECT FOLDER STRUCTURE
+
+Maintain the following structure.
+
+ai-payment-guardian/
+│
+├── PROJECT_BLUEPRINT.md
+├── README.md
+├── .gitignore
+├── .env.example
+├── docker-compose.yml
+│
+├── frontend/
+│   └── web/
+│       ├── src/
+│       │   ├── app/
+│       │   ├── components/
+│       │   ├── features/
+│       │   ├── services/
+│       │   ├── hooks/
+│       │   ├── styles/
+│       │   └── utils/
+│       └── package.json
+│
+├── mobile/
+│   ├── app/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── features/
+│   │   ├── services/
+│   │   └── utils/
+│   └── package.json
+│
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── core/
+│   │   ├── api/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── repositories/
+│   │   ├── services/
+│   │   ├── modules/
+│   │   │   ├── auth/
+│   │   │   ├── users/
+│   │   │   ├── banking/
+│   │   │   ├── accounts/
+│   │   │   ├── transactions/
+│   │   │   ├── bills/
+│   │   │   ├── subscriptions/
+│   │   │   ├── analytics/
+│   │   │   ├── forecasting/
+│   │   │   ├── ai/
+│   │   │   ├── approvals/
+│   │   │   ├── notifications/
+│   │   │   └── audit/
+│   │   └── workers/
+│   ├── migrations/
+│   ├── tests/
+│   └── requirements.txt
+│
+├── phases/
+│   ├── PHASE_1_FOUNDATION.md
+│   ├── PHASE_2_FINANCIAL_DATA.md
+│   ├── PHASE_3_PREDICTION_ENGINE.md
+│   ├── PHASE_4_AI_ASSISTANT.md
+│   ├── PHASE_5_APPROVALS_AND_ALERTS.md
+│   └── PHASE_6_TESTING_AND_DEPLOYMENT.md
+│
+├── docs/
+│   ├── architecture/
+│   ├── database/
+│   ├── api/
+│   ├── security/
+│   └── deployment/
+│
+├── infrastructure/
+│   ├── docker/
+│   ├── scripts/
+│   └── ci/
+│
+└── .github/
+    └── workflows/
+
+This is the target structure. Create directories and files progressively as required. Do not create empty files or unnecessary abstractions merely to match the structure.
+
+---
+
+# 8. DATABASE DESIGN PRINCIPLES
+
+The database must be designed to support all six phases.
+
+Expected core entities:
+
+1. Users.
+2. User preferences.
+3. Bank connections.
+4. Bank consents.
+5. Financial accounts.
+6. Account balance snapshots.
+7. Transactions.
+8. Transaction categories.
+9. Bills.
+10. Subscriptions.
+11. Forecasts.
+12. Financial insights.
+13. AI conversations.
+14. AI messages.
+15. Action proposals.
+16. Approvals.
+17. Executed actions.
+18. Notifications.
+19. Audit events.
+
+Use appropriate foreign keys, indexes, constraints and timestamps.
+
+All user-specific records must have ownership validation.
+
+Use database migrations to manage schema changes.
+
+Do not modify existing database structures without analysing their dependencies.
+
+---
+
+# 9. API DEVELOPMENT PRINCIPLES
+
+Use versioned REST APIs.
+
+Recommended prefix:
+
+/api/v1/
+
+Organise APIs according to their functional modules.
+
+Examples:
+
+Authentication:
+- POST /auth/register
+- POST /auth/login
+- POST /auth/logout
+- GET /users/me
+
+Banking:
+- GET /bank-connections
+- POST /bank-connections
+- POST /bank-connections/{id}/sync
+- POST /bank-connections/{id}/revoke
+
+Financial Data:
+- GET /accounts
+- GET /transactions
+- GET /bills
+- GET /subscriptions
+
+Analytics:
+- GET /analytics/summary
+- GET /analytics/spending
+- GET /forecasts
+
+AI:
+- POST /assistant/conversations
+- POST /assistant/messages
+
+Approvals:
+- GET /approvals
+- POST /approvals/{id}/approve
+- POST /approvals/{id}/reject
+
+Use appropriate HTTP methods, validation, authentication and error responses.
+
+Do not expose sensitive provider credentials through API responses.
+
+---
+
+# 10. AI AGENT ARCHITECTURE AND OPERATING RULES
+
+The AI agent is the central intelligence layer of this project.
+
+It must operate through controlled backend services and tools.
+
+The agent must follow this sequence:
+
+1. Receive the user's request.
+2. Identify the user's intent.
+3. Determine the required financial information.
+4. Call authorised backend tools.
+5. Retrieve verified information.
+6. Analyse the information.
+7. Generate an understandable response.
+8. Identify whether an action proposal is needed.
+9. Request user approval when necessary.
+10. Record the final outcome.
+
+The AI model must not independently modify database records or directly access financial providers.
+
+All data modification must pass through validated backend services.
+
+All financial calculations must be completed by the backend.
+
+The AI agent should be modular so that the LLM provider can be changed without rewriting the entire financial system.
+
+---
+
+# 11. UI/UX REQUIREMENTS
+
+The application must prioritise simplicity.
+
+The dashboard should display:
+
+1. Greeting and account synchronisation status.
+2. Available balance.
+3. Upcoming payments.
+4. Projected balance.
+5. Important financial insight.
+6. Recent transactions.
+7. Ask Guardian entry point.
+
+Web navigation:
+
+- Dashboard.
+- Transactions.
+- Payments.
+- Insights.
+- Ask Guardian.
+- Settings.
+
+Mobile navigation:
+
+- Home.
+- Activity.
+- Payments.
+- Guardian.
+- Profile.
+
+Do not overload the dashboard with charts.
+
+Use secondary pages for detailed financial analysis.
+
+Maintain consistent design components across both applications.
+
+Every screen must support appropriate loading, empty, success and error states.
+
+---
+
+# 12. SECURITY AND FINANCIAL SAFETY REQUIREMENTS
+
+These requirements are mandatory throughout development.
+
+1. Never store banking passwords.
+2. Never request or store UPI PINs.
+3. Never store OTPs or CVVs.
+4. Obtain explicit bank-data consent.
+5. Respect consent revocation.
+6. Enforce user-level data isolation.
+7. Protect API endpoints.
+8. Validate all AI tool calls.
+9. Keep sensitive information out of application logs.
+10. Require explicit approval for consequential actions.
+11. Revalidate action details before execution.
+12. Prevent duplicate action execution.
+13. Maintain an audit trail.
+14. Never claim payment success without trusted confirmation.
+15. Clearly distinguish mock data from actual bank data.
+16. Clearly distinguish actual, pending and predicted financial values.
+
+Security must not be postponed until Phase 6. Basic security must be implemented in every phase, with comprehensive hardening in Phase 6.
+
+---
+
+# 13. GIT, DOCKER AND DEVELOPMENT MANAGEMENT
+
+Use Git for version control.
+
+Maintain a stable main branch.
+
+Use separate feature branches for development.
+
+Suggested branches:
+
+- feature/phase-1-foundation
+- feature/phase-2-financial-data
+- feature/phase-3-prediction-engine
+- feature/phase-4-ai-agent
+- feature/phase-5-approval-system
+- feature/phase-6-deployment
+
+Commit changes in small, meaningful units.
+
+Never commit:
+
+- .env files.
+- API keys.
+- Access tokens.
+- Banking credentials.
+- Real financial records.
+- Private certificates.
+
+Use Docker for reproducible local development.
+
+Use Docker Compose to manage services when required.
+
+Keep configuration separate for development, testing and production.
+
+---
+
+# 14. MANDATORY INSTRUCTIONS FOR OPENCODE AI CODING AGENT
+
+The following instructions must be followed whenever OpenCode analyses or implements any project phase.
+
+## A. Understand Before Coding
+
+Before making changes:
+
+1. Read this complete PROJECT_BLUEPRINT.md.
+2. Identify the current development phase.
+3. Inspect the existing project folder structure.
+4. Read relevant source files.
+5. Identify already implemented functionality.
+6. Understand the database schema.
+7. Identify dependencies on previous phases.
+8. Identify missing requirements.
+9. Check whether existing code can be reused.
+10. Prepare an implementation plan.
+
+Never start modifying code immediately without analysing the existing project.
+
+## B. Respect Phase Boundaries
+
+Implement only the functionality requested for the current phase.
+
+Understand future-phase requirements so that current code remains compatible with them.
+
+Do not prematurely implement entire future phases.
+
+For example:
+
+- Phase 1 must prepare the application foundation for banking functionality.
+- Phase 2 must prepare reliable financial records for analytics.
+- Phase 3 must expose structured insights for the AI agent.
+- Phase 4 must use those insights through controlled tools.
+- Phase 5 must introduce approval-based actions.
+- Phase 6 must integrate, test and deploy the complete application.
+
+## C. Preserve Existing Functionality
+
+Before modifying any file:
+
+- Understand its current purpose.
+- Identify its dependencies.
+- Check its imports and API contracts.
+- Avoid unnecessary rewrites.
+- Preserve previously completed features.
+- Do not delete existing functionality unless explicitly required.
+
+Do not replace working code merely to implement a different coding style.
+
+## D. Avoid Duplicate Implementations
+
+Before creating a new component, service, model or API:
+
+- Search the existing project.
+- Check whether equivalent functionality already exists.
+- Reuse existing implementations where appropriate.
+- Extend existing modules instead of creating duplicate modules.
+
+Maintain a single source of truth for important business logic.
+
+## E. Maintain Architecture
+
+Keep frontend, backend, database and integration responsibilities separate.
+
+Do not place financial calculations in frontend components.
+
+Do not place business logic directly inside API route handlers when it belongs in a service.
+
+Do not allow the AI model to bypass backend permissions.
+
+Do not make direct bank-provider calls from the frontend.
+
+Use modular and maintainable code.
+
+## F. Coding Standards
+
+- Use meaningful names.
+- Keep functions focused.
+- Avoid unnecessary code duplication.
+- Add type annotations where appropriate.
+- Validate input and output.
+- Handle exceptions properly.
+- Use environment variables for configuration.
+- Follow consistent formatting.
+- Write reusable components.
+- Document complex business logic.
+- Add tests for important functionality.
+
+Do not introduce unnecessary design patterns or abstractions.
+
+## G. Dependency Management
+
+Before installing a new dependency:
+
+1. Check whether it is already installed.
+2. Determine whether it is necessary.
+3. Check compatibility with existing versions.
+4. Explain its purpose.
+5. Avoid installing multiple libraries for the same functionality.
+
+Keep dependency files updated.
+
+## H. Database Management
+
+- Inspect existing models before changing them.
+- Use migrations.
+- Preserve existing records.
+- Avoid destructive schema changes.
+- Add appropriate relationships.
+- Enforce data ownership.
+- Add indexes where useful.
+- Keep database and application schemas consistent.
+
+Never reset or delete a working database without explicit permission.
+
+## I. Frontend Requirements
+
+- Maintain a simple and consistent interface.
+- Avoid overcrowded screens.
+- Use reusable components.
+- Handle loading and error states.
+- Maintain responsive layouts.
+- Ensure web and mobile functionality remain consistent.
+- Do not expose internal backend implementation details to users.
+
+## J. AI Safety Requirements
+
+- Use controlled backend tools.
+- Enforce user-level permissions.
+- Never expose unrestricted database access.
+- Never rely on AI-generated arithmetic for authoritative financial calculations.
+- Never allow AI text to count as payment approval.
+- Require explicit user confirmation for consequential actions.
+- Record important actions and decisions.
+
+## K. Testing Requirements
+
+After implementing a feature:
+
+1. Run relevant tests.
+2. Check backend startup.
+3. Check frontend build.
+4. Verify API communication.
+5. Check database operations.
+6. Check authentication and authorisation.
+7. Check error handling.
+8. Verify that previous functionality remains intact.
+
+Do not claim that a feature works if it has not been tested.
+
+If testing cannot be performed, explicitly report that limitation.
+
+## L. Reporting Requirements
+
+After completing a phase or requested task, provide a clear report containing:
+
+1. What was analysed.
+2. What was implemented.
+3. Files created.
+4. Files modified.
+5. Dependencies installed.
+6. Database changes.
+7. Tests performed.
+8. Test results.
+9. Known limitations.
+10. Remaining tasks.
+
+Clearly distinguish completed functionality from partially implemented functionality.
+
+---
+
+# 15. PHASE COMPLETION PROTOCOL
+
+A phase must not be considered complete merely because the code has been written.
+
+Before declaring a phase complete:
+
+- All requested features must be implemented.
+- Previous-phase functionality must remain functional.
+- Relevant tests must pass.
+- API contracts must be consistent.
+- Database changes must be verified.
+- Security requirements must be checked.
+- Documentation must be updated.
+
+Maintain a phase progress document.
+
+Suggested format:
+
+| Requirement | Status | Notes |
+|---|---|---|
+| Authentication | Complete / Pending | |
+| Database integration | Complete / Pending | |
+| API implementation | Complete / Pending | |
+| Frontend integration | Complete / Pending | |
+| Testing | Complete / Pending | |
+| Documentation | Complete / Pending | |
+
+Do not mark incomplete features as completed.
+
+---
+
+# 16. FINAL PROJECT SUCCESS CRITERIA
+
+AI Payment Guardian will be considered successfully developed when:
+
+1. Users can securely access the application through web and mobile.
+2. Users can connect financial accounts through an authorised integration.
+3. Financial data is synchronised and organised correctly.
+4. Transactions, bills and subscriptions can be managed.
+5. The application can analyse spending patterns.
+6. The prediction engine can estimate future cash flow.
+7. The AI agent can understand and answer financial questions.
+8. The AI agent can generate useful recommendations.
+9. The system can issue relevant financial alerts.
+10. The agent can prepare proposed financial actions.
+11. Users retain control through explicit approval.
+12. All important actions are recorded.
+13. The application is tested and secure.
+14. The complete application can be deployed.
+
+---
+
+# 17. FINAL DEVELOPMENT DIRECTIVE
+
+AI Payment Guardian must be developed as a single integrated software product through six controlled development phases.
+
+Every phase must contribute to the same final architecture.
+
+The project must prioritise:
+
+- Reliability over unnecessary complexity.
+- Security over convenience.
+- Accurate financial calculations over AI-generated guesses.
+- User control over unrestricted agent autonomy.
+- Reusability over duplicate code.
+- Clear interfaces over information overload.
+- Tested functionality over unverified implementation.
+
+**MOST IMPORTANT INSTRUCTION TO THE OPENCODE AGENT:**
+
+Before implementing any phase, analyse this entire blueprint and the existing project codebase. Understand the completed phases, identify the requirements of the requested phase, check dependencies, and prepare a detailed implementation plan.
+
+Implement the requested phase without breaking previous functionality or introducing unnecessary changes.
+
+Treat this document as the master reference for all future development decisions.
+
+The ultimate goal is to deliver a complete, reliable, secure and intelligent AI Payment Guardian application that works consistently across web and mobile platforms.
+
+**Development sequence: PHASE 1 → PHASE 2 → PHASE 3 → PHASE 4 → PHASE 5 → PHASE 6.**
