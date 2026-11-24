@@ -57,3 +57,14 @@ playwright-report/
 
 # ---- Docker ---------------------------------------------------------------
 postgres_data/
+
+# ---- Local verification artifacts -----------------------------------------
+# Console output captured from manual test runs; regenerate on demand.
+postgres-test-output.txt
+smoke-output.txt
+sqlite-test-output.txt
+
+# ---- Personal editor settings --------------------------------------------
+# `.vscode/*` above whitelists settings.json; this local editor preference is
+# machine-specific and stays out of version control.
+.vscode/settings.json
