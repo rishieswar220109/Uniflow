@@ -83,7 +83,7 @@ export default function LoginScreen() {
       <View style={styles.heading}>
         <Text style={[styles.title, { color: colors.text }]}>Welcome back</Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Sign in to your secure Guardian workspace.
+          Sign in to your secure UniFlow workspace.
         </Text>
       </View>
 
@@ -124,7 +124,7 @@ export default function LoginScreen() {
 
       <View style={styles.switchRow}>
         <Text style={[styles.switchCopy, { color: colors.muted }]}>
-          New to Guardian?
+          New to UniFlow?
         </Text>
         <Pressable
           accessibilityRole="link"
@@ -139,7 +139,7 @@ export default function LoginScreen() {
       <View style={styles.note}>
         <Ionicons name="lock-closed-outline" size={14} color={colors.subtle} />
         <Text style={[styles.noteText, { color: colors.subtle }]}>
-          Guardian never asks for banking passwords, UPI PINs, OTPs or CVVs.
+          UniFlow never asks for banking passwords, UPI PINs, OTPs or CVVs.
         </Text>
       </View>
     </Screen>

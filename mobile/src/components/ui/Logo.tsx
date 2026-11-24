@@ -12,7 +12,7 @@ export function Logo({ compact = false }: LogoProps) {
   const markSize = compact ? 34 : 42
 
   return (
-    <View style={styles.container} accessibilityLabel="AI Payment Guardian">
+    <View style={styles.container} accessibilityLabel="UniFlow">
       <View
         style={[
           styles.mark,
@@ -37,7 +37,7 @@ export function Logo({ compact = false }: LogoProps) {
             { color: colors.text, fontSize: compact ? 16 : 18 },
           ]}
         >
-          AI Payment Guardian
+          UniFlow
         </Text>
         {compact ? null : (
           <Text style={[styles.tagline, { color: colors.muted }]}>

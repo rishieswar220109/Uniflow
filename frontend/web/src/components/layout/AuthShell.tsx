@@ -22,7 +22,7 @@ export function AuthShell({
         <div className="auth-brand-content">
           <h2>Your finances, watched over — not taken over.</h2>
           <p>
-            AI Payment Guardian helps you understand what is coming, what is
+            UniFlow helps you understand what is coming, what is
             safe to spend, and which payments deserve attention. You stay in
             control of every decision.
           </p>
@@ -73,7 +73,7 @@ export function AuthShell({
           {footer}
 
           <div className="auth-footer-links">
-            <a href="/">AI Payment Guardian</a>
+            <a href="/">UniFlow</a>
             <span>Phase 1 · Secure foundation</span>
           </div>
         </div>

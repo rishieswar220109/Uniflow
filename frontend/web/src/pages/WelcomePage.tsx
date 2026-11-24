@@ -38,7 +38,7 @@ const previewRows = [
   },
   {
     icon: SparklesIcon,
-    title: 'Ask Guardian',
+    title: 'Ask UniFlow',
     sub: 'Answers grounded in your verified data',
     state: 'Phase 4',
   },
@@ -80,13 +80,13 @@ export function WelcomePage() {
       <main id="main-content">
         <section className="container hero">
           <div className="hero-copy">
-            <span className="eyebrow">AI-powered financial guardian</span>
+            <span className="eyebrow">AI-powered financial intelligence</span>
             <h1 className="hero-title">
               Know what&apos;s coming.{' '}
               <span className="accent">Stay in control.</span>
             </h1>
             <p className="hero-lede">
-              AI Payment Guardian turns authorised financial data into clear
+              UniFlow turns authorised financial data into clear
               answers about your balance, upcoming payments and the decisions
               ahead — so you can act with confidence, never guesswork.
             </p>
@@ -128,7 +128,7 @@ export function WelcomePage() {
                   <span className="preview-brand-mark">
                     <ShieldCheckIcon size={18} />
                   </span>
-                  Guardian workspace
+                  UniFlow workspace
                 </div>
                 <span className="preview-label">Preview</span>
               </div>
@@ -165,7 +165,7 @@ export function WelcomePage() {
         <section
           className="container feature-strip"
           id="how-it-works"
-          aria-label="How Guardian works"
+          aria-label="How UniFlow works"
         >
           <article className="feature-cell">
             <span className="feature-icon">
@@ -183,7 +183,7 @@ export function WelcomePage() {
             </span>
             <h3>Consent comes first</h3>
             <p>
-              Guardian will only use financial data you explicitly authorise
+              UniFlow will only use financial data you explicitly authorise
               through a bank-data provider. Revoking consent stops access.
             </p>
           </article>
@@ -202,7 +202,7 @@ export function WelcomePage() {
 
       <footer className="welcome-footer">
         <div className="container welcome-footer-inner">
-          <span>© {CURRENT_YEAR} AI Payment Guardian</span>
+          <span>© {CURRENT_YEAR} UniFlow</span>
           <span>Phase 1 · Secure account foundation</span>
         </div>
       </footer>

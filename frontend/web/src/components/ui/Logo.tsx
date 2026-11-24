@@ -13,12 +13,12 @@ export function Logo({
   className?: string
 }) {
   return (
-    <Link to={to} className={cx('logo', className)} aria-label="AI Payment Guardian home">
+    <Link to={to} className={cx('logo', className)} aria-label="UniFlow home">
       <span className="logo-mark">
         <ShieldCheckIcon size={21} />
       </span>
       <span className="logo-text">
-        <span className="logo-name">AI Payment Guardian</span>
+        <span className="logo-name">UniFlow</span>
         {showTag ? <span className="logo-tag">Personal finance, safeguarded</span> : null}
       </span>
     </Link>

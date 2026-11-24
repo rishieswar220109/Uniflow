@@ -32,7 +32,7 @@ const previewItems = [
   },
   {
     icon: 'sparkles-outline' as const,
-    title: 'Ask Guardian',
+    title: 'Ask UniFlow',
     detail: 'Answers grounded in your verified data.',
     phase: 'Phase 4',
   },
@@ -49,13 +49,13 @@ export default function WelcomeScreen() {
       <Logo />
 
       <View style={styles.hero}>
-        <Badge label="AI-powered financial guardian" tone="primary" icon="sparkles" />
+        <Badge label="AI-powered financial intelligence" tone="primary" icon="sparkles" />
         <Text style={[styles.title, { color: colors.text }]}>
           Know what&apos;s coming.{' '}
           <Text style={{ color: colors.primary }}>Stay in control.</Text>
         </Text>
         <Text style={[styles.lede, { color: colors.muted }]}>
-          AI Payment Guardian turns authorised financial data into clear answers
+          UniFlow turns authorised financial data into clear answers
           about your balance, upcoming payments and the decisions ahead — so you
           can act with confidence, never guesswork.
         </Text>
@@ -106,7 +106,7 @@ export default function WelcomeScreen() {
       <Card>
         <View style={styles.sectionHead}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            What Guardian will unlock
+            What UniFlow will unlock
           </Text>
           <Badge label="Phase 1 foundation" tone="neutral" />
         </View>
@@ -157,14 +157,14 @@ export default function WelcomeScreen() {
           </Text>
         </View>
         <Text style={[styles.securityCopy, { color: colors.muted }]}>
-          Guardian never asks for banking passwords, UPI PINs, OTPs or CVVs.
+          UniFlow never asks for banking passwords, UPI PINs, OTPs or CVVs.
           Every consequential action in later phases will require your explicit
           approval.
         </Text>
       </Card>
 
       <Text style={[styles.footer, { color: colors.subtle }]}>
-        AI Payment Guardian · Secure account foundation
+        UniFlow · Secure account foundation
       </Text>
     </Screen>
   )

@@ -2,7 +2,7 @@
   "name": "ai-payment-guardian",
   "version": "1.0.0",
   "private": true,
-  "description": "AI Payment Guardian - Phase 1 secure account foundation",
+  "description": "UniFlow - Phase 1 secure account foundation",
   "scripts": {
     "web:dev": "npm --prefix frontend/web run dev",
     "web:test": "npm --prefix frontend/web test -- --run",

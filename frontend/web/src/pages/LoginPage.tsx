@@ -65,10 +65,10 @@ export function LoginPage() {
   return (
     <AuthShell
       title="Welcome back"
-      subtitle="Sign in to your Guardian workspace."
+      subtitle="Sign in to your UniFlow workspace."
       footer={
         <p className="auth-switch">
-          New to AI Payment Guardian? <Link to="/register">Create an account</Link>
+          New to UniFlow? <Link to="/register">Create an account</Link>
         </p>
       }
     >

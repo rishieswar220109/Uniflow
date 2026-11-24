@@ -91,7 +91,7 @@ export default function RegisterScreen() {
           Create your account
         </Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Set up a secure Guardian workspace in under a minute.
+          Set up a secure UniFlow workspace in under a minute.
         </Text>
       </View>
 
@@ -156,7 +156,7 @@ export default function RegisterScreen() {
 
       <Text style={[styles.legal, { color: colors.subtle }]}>
         By creating an account, you confirm that these details are yours and
-        that you will keep your sign-in credentials private. Guardian never asks
+        that you will keep your sign-in credentials private. UniFlow never asks
         for banking passwords, UPI PINs, OTPs or CVVs.
       </Text>
 

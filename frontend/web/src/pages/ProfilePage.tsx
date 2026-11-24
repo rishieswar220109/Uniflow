@@ -140,7 +140,7 @@ export function ProfilePage() {
               </div>
             </div>
             <p className="muted-note" style={{ lineHeight: 1.65 }}>
-              Guardian stores your name, email address, preferences and securely
+              UniFlow stores your name, email address, preferences and securely
               hashed authentication records. No bank balances, transactions,
               banking passwords, PINs, OTPs or card credentials are stored in
               this phase.
@@ -194,7 +194,7 @@ export function ProfilePage() {
               </h2>
             </div>
             <p className="muted-note" style={{ lineHeight: 1.65 }}>
-              Guardian will never ask for your internet-banking password, UPI
+              UniFlow will never ask for your internet-banking password, UPI
               PIN, OTP or CVV.
 
               Report anything suspicious before sharing credentials with any

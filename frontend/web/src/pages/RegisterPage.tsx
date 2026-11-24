@@ -66,7 +66,7 @@ export function RegisterPage() {
   return (
     <AuthShell
       title="Create your account"
-      subtitle="Set up a secure Guardian workspace in under a minute."
+      subtitle="Set up a secure UniFlow workspace in under a minute."
       footer={
         <p className="auth-switch">
           Already have an account? <Link to="/login">Sign in</Link>
@@ -137,7 +137,7 @@ export function RegisterPage() {
 
       <p className="auth-legal">
         By creating an account, you confirm that these details are yours and
-        that you will keep your sign-in credentials private. Guardian never asks
+        that you will keep your sign-in credentials private. UniFlow never asks
         for banking passwords, UPI PINs, OTPs or CVVs.
       </p>
     </AuthShell>
