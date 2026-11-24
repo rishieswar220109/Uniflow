@@ -23,6 +23,10 @@ Fill in:
 - `TEST_DATABASE_URL` — must end in `_test`.
 - `REFRESH_COOKIE_SECURE=true` only when serving over HTTPS. Keep `false` for
   local HTTP.
+- `AUTH_RATE_LIMIT_*` — authentication throttling; defaults to 10 requests per
+  300 seconds. Disable only for controlled testing.
+- `BANK_PROVIDER` — financial-data provider slug. Only `mock` is bundled.
+- `BANK_SYNC_LOOKBACK_DAYS` — first-sync transaction lookback (default 120).
 
 `.env` is gitignored. `.env.example` must stay placeholder-only.
 
@@ -39,6 +43,17 @@ This starts:
 - PostgreSQL 17 with a persistent named volume.
 - The backend on port `8000`, waiting for a healthy database, running
   `alembic upgrade head`, then starting Uvicorn with reload.
+
+> **Startup migrates automatically.** Because `alembic upgrade head` runs as
+> part of the container command (in both `docker-compose.yml` and
+> `backend/Dockerfile`), any pending revision in `backend/migrations/versions/`
+> is applied the next time the stack starts or is rebuilt — without an approval
+> step and without an automatic backup. This is how revision
+> `0003_phase3_intelligence` reached the development database. Until the startup
+> workflow is changed (proposed: drop `alembic upgrade head` from the container
+> command and migrate explicitly after a verified backup), take the backup
+> described in [`docs/database/schema.md`](../database/schema.md#migrations)
+> before starting the stack with unreviewed migrations present.
 
 Verify:
 
@@ -164,7 +179,8 @@ npm test -- --run
 | Backend exits at startup in production | Weak `JWT_SECRET_KEY` or insecure cookie flags |
 | Browser request blocked by CORS | Origin missing from `CORS_ORIGINS` |
 | Mobile cannot reach the API | Using `localhost` on a physical device; use the LAN IP |
-| Refresh works on web but not mobile | Mobile must send `X-Client-Platform: mobile` to receive the refresh token |
+| Refresh works on web but not mobile | Mobile refresh must send the refresh token in the request body; `X-Client-Platform` alone is not a credential |
+| Authentication request returns `429` | The per-IP limit was reached; wait for `Retry-After` or tune `AUTH_RATE_LIMIT_*` |
 | Direct mobile deep link returns 404 on a static host | Configure SPA fallback to `index.html` |
 | Database schema drift | Run `alembic check`; generate a new revision instead of editing one |
 

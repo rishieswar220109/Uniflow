@@ -1,6 +1,6 @@
 # Web Application
 
-React 19 + TypeScript + Vite client for AI Payment Guardian.
+React 19 + TypeScript + Vite client for UniFlow.
 
 Phase 1 provides the Welcome, Register, Login, Dashboard, Profile and Settings
 screens. The dashboard intentionally shows no financial data; it explains

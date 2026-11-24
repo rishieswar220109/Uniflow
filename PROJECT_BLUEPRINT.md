@@ -1,6 +1,11 @@
 # AI PAYMENT GUARDIAN
 ## Master Project Blueprint and Development Instructions
 
+> **Product name update:** this blueprint is the original specification, written
+> under the working name "AI Payment Guardian". The product now ships as
+> **UniFlow**. The historical name is retained throughout this document for
+> traceability; only user-facing surfaces use the new name.
+
 **Project Name:** AI Payment Guardian  
 **Project Type:** AI-Powered Personal Finance and Payment Management Agent  
 **Development Approach:** Six-Phase Incremental Development  
@@ -97,6 +102,12 @@ The system must support:
 - Password management.
 - User preferences.
 - Session management.
+- Account status management. Disabling an account invalidates every existing
+  session; re-enabling it does not restore them. Application-driven status
+  changes are applied atomically with session revocation, and an ORM guard
+  enforces the same rule for any other ORM write of `User.is_active`. Phase 1
+  exposes no public or administrative status operation; the invariant exists
+  so that any future one is safe by construction.
 - Account deletion and data management.
 
 Each user must only be able to access their own financial information.
@@ -303,6 +314,11 @@ Do not skip required dependencies or implement future-phase functionality premat
 
 ## PHASE 1 — PROJECT FOUNDATION AND AUTHENTICATION
 
+**Status:** Complete and formally closed on 18 November 2026 (independent
+review: **FINAL PASS**, no blocking findings). Final test results, accepted
+limitations and verification evidence are recorded in
+`phases/PHASE_1_PROGRESS.md`.
+
 ### Objective
 
 Establish the project infrastructure, configure all development environments and implement secure user authentication.
@@ -356,6 +372,7 @@ Use database migrations.
 - Protect private API endpoints.
 - Validate incoming data.
 - Protect authentication tokens.
+- Rate-limit login, registration and refresh endpoints and return `429` with `Retry-After` when a client exceeds the limit.
 - Store secrets in environment variables.
 - Enforce user-level data isolation.
 
@@ -378,6 +395,12 @@ A working web and mobile application with secure authentication and a centralize
 ---
 
 ## PHASE 2 — BANK INTEGRATION AND FINANCIAL DATA MANAGEMENT
+
+**Status:** Implemented on 20 November 2026 and re-verified on 21 November 2026
+after an independent read-only review. Requirement checklist,
+exact test results and accepted limitations are recorded in
+`phases/PHASE_2_PROGRESS.md`. Only the mock provider is bundled; no Phase 3
+analysis, forecasting or AI behaviour is included.
 
 ### Objective
 
@@ -479,6 +502,11 @@ A functional financial data management system.
 
 ## PHASE 3 — FINANCIAL INTELLIGENCE AND PREDICTION ENGINE
 
+**Status:** Implemented and verified on 23 November 2026. **Not formally
+closed:** migration `0003_phase3_intelligence` is not yet applied to the
+development database. Verification evidence is recorded in
+`phases/PHASE_3_PROGRESS.md`. Phase 4 has not been started.
+
 ### Objective
 
 Transform the financial records obtained in Phase 2 into meaningful financial intelligence.
@@ -520,6 +548,25 @@ Implement:
 - Unusual changes in spending patterns.
 - Unreviewed recurring payments.
 
+### Budget Planner
+
+Implement:
+
+- Monthly and category-based budgets.
+- Create, edit and manage budgets.
+- Track actual spending, remaining amounts and overspending.
+- Savings goals where appropriate.
+
+### Proactive Spending Awareness
+
+Implement:
+
+- Configurable advance reminders, including 3–4 days before dues.
+- Due-date and optional post-payment reminders.
+- Entertainment spending alerts before/after transactions according to user preference.
+- Configurable categories, thresholds, timing and frequency.
+- Persist user preferences reliably.
+
 ### Intelligence Engine Design
 
 Use deterministic Python services for calculations and financial rules.
@@ -549,6 +596,8 @@ Output:
 - Upcoming payment insights.
 - Risk notifications.
 - Financial reports.
+- Budget planner.
+- Spending preferences.
 
 ### Completion Criteria
 
@@ -1479,3 +1528,109 @@ Treat this document as the master reference for all future development decisions
 The ultimate goal is to deliver a complete, reliable, secure and intelligent AI Payment Guardian application that works consistently across web and mobile platforms.
 
 **Development sequence: PHASE 1 → PHASE 2 → PHASE 3 → PHASE 4 → PHASE 5 → PHASE 6.**
+
+---
+
+# 18. LONG-TERM PRODUCT VISION
+
+Everything in this section is **future scope**. None of it is implemented in
+Phases 1–3, and none of it changes the phase sequence above. It records the
+product direction so later phases are designed coherently rather than bolted
+on.
+
+The long-term product expands AI Payment Guardian from a passive financial
+analyser into a guarded money assistant across banking, investments and
+fraud protection — always with explicit user approval and auditable records.
+
+## 18.1 Indian and global stock markets
+
+- Read-only portfolio aggregation across Indian brokers (for example
+  NSDL/CDSL-backed holdings and broker APIs) and global brokerage accounts,
+  with per-account consent and revocation.
+- Market data (quotes, indices, corporate actions) from a licensed data
+  provider, clearly timestamps and sourced; no scraped or invented prices.
+- Portfolio analytics: allocation, sector and geography exposure, unrealised
+  and realised gain/loss in the holding's own currency, dividend history.
+- Currency-aware reporting: INR and non-INR holdings are shown separately, or
+  converted only with a disclosed, dated exchange rate.
+- Educational, deterministic insights first (concentration risk, overlapping
+  holdings, high expense ratios). No personalised buy/sell recommendation until
+  the compliance work in 18.3 is complete.
+
+## 18.2 Gold, silver and other physical/commodity holdings
+
+- Track digital gold, sovereign gold bonds, ETFs, coins and jewellery as
+  holdings with quantity, purity, purchase date and acquisition cost.
+- Separate acquisition cost from current valuation; label valuation source and
+  timestamp, and never present a stale price as current.
+- Goal linkage: allow a savings goal to be backed by a commodity holding while
+  keeping cash and commodity totals distinct.
+
+## 18.3 User-approved trading (not autonomous trading)
+
+- The agent may **prepare** a proposed order (instrument, quantity, order type,
+  limit price, estimated charges and taxes) and explain it.
+- Execution requires an explicit, per-order user approval with a re-entered
+  credential or biometric confirmation, a visible expiry, and a full audit
+  record of what was proposed, approved, rejected or failed.
+- No autonomous trading, no unattended execution, no model-initiated order,
+  and no stored brokerage credential that allows withdrawal or transfer.
+- Hard safety controls: per-order and daily value caps, instrument allowlists,
+  market-hours checks, dry-run mode, and an immediate global kill switch.
+- Regulatory and legal review is a prerequisite: broker/exchange terms, SEBI
+  and other applicable rules, suitability obligations, record retention and
+  tax reporting. Until that review passes, the product remains read-only.
+
+## 18.4 UPI and suspicious-account detection
+
+- Analyse the user's **own** payment history (and user-supplied payment
+  requests) for risk signals: first-time payee, sudden change in payee
+  behaviour, mule-account patterns, mismatched payee name, unusual amount or
+  timing, and repeated failed attempts.
+- Present a clear, explainable warning before the user confirms a payment, with
+  the specific signals that triggered it. Never silently block a legitimate
+  payment and never claim to have intercepted one at the banking network.
+- No collection or storage of another person's banking credentials, UPI PIN,
+  OTP or card security code. Detection uses the user's records and consented
+  data only.
+- False-positive handling: easy dismissal, feedback capture and tuning, so
+  warnings stay credible.
+
+## 18.5 Scams, phishing and investment fraud
+
+- Explainable fraud scoring for messages, links and payment requests the user
+  explicitly submits: urgency and pressure language, impersonation of a bank
+  or authority, unrealistic returns, payment to a personal account, and
+  requests for OTPs or remote-access apps.
+- Education-first guidance ("this pattern matches known investment fraud")
+  rather than absolute claims. The assistant is not a substitute for the
+  user's bank, regulator or law enforcement.
+- A report-and-preserve flow that packages evidence for the user to submit,
+  without uploading it anywhere without consent.
+- Clear disclaimers, privacy limits on submitted content, and no retention of
+  sensitive message contents beyond what the user chooses to keep.
+
+## 18.6 Notification discipline (anti-spam)
+
+- A single notification budget per user per day, with priority tiers
+  (critical risk > due payment > budget warning > informational insight).
+- Deduplication and quiet hours from user preferences, plus per-channel and
+  per-category opt-in.
+- Explain-why metadata on every alert, one-tap dismiss/snooze, and weekly
+  digest batching for non-urgent items.
+- Hard rule: no marketing or engagement notifications in the financial-alert
+  channel.
+
+## 18.7 Cross-cutting requirements for all long-term features
+
+- User approval and auditability before any action that moves money or places
+  an order.
+- Consent-based data access with revocation, per-account scoping and no
+  credential storage beyond opaque provider references.
+- Deterministic, explainable calculations before generative explanations; an
+  AI model may describe results, never invent them.
+- Explicit currency handling with sourced rates and no silent conversion.
+- Security review, threat modelling and abuse-case testing per feature,
+  including data isolation between users.
+- Legal and regulatory review per market before enabling anything beyond
+  read-only analysis.

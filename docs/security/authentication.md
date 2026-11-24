@@ -1,8 +1,10 @@
-# Authentication and Security — Phase 1
+# Authentication and Security
 
-Phase 1 protects accounts and sessions only. No financial data or bank
-credentials exist in the system yet, and the application never asks for banking
-passwords, UPI PINs, OTPs or card CVVs.
+UniFlow protects accounts, sessions and all user-owned financial
+records through short-lived access tokens and server-side sessions. Phase 2 adds
+consent-based bank data; the application never asks for banking passwords, UPI
+PINs, OTPs or card CVVs, and stores only opaque provider references and consent
+metadata.
 
 ## Passwords
 
@@ -16,6 +18,23 @@ passwords, UPI PINs, OTPs or card CVVs.
 - Registration requires 8–128 characters with at least one letter and one digit.
   Email uniqueness is enforced by the database as well as the service.
 
+## Rate limiting
+
+- Login, registration and refresh are limited per client IP and action in a
+  sliding window (10 requests per 300 seconds by default).
+- Exceeding the limit returns `429` with `code: "rate_limited"` and a
+  `Retry-After` header.
+- Buckets are separate per action, so exhausting login attempts does not block
+  registration or refresh.
+- The limiter is in-process: counters reset when the process restarts, idle
+  per-address keys are not swept, and counters are not shared between workers.
+  Multi-worker or multi-replica deployments must also enforce limits at the
+  edge or with a shared store, and must derive the client address from a
+  trusted proxy configuration. The refresh bucket is shared by all clients
+  behind one address.
+- Account lockout is not implemented, avoiding a permanent denial-of-service
+  vector against a known email address.
+
 ## Access tokens
 
 - Short-lived JWTs (15 minutes by default), signed with `JWT_SECRET_KEY`.
@@ -25,7 +44,21 @@ passwords, UPI PINs, OTPs or card CVVs.
 - The referenced session must exist, belong to the same user, be unrevoked and
   be unexpired. This means logout and rotation invalidate access tokens
   immediately instead of waiting for JWT expiry.
-- Disabled users are rejected with `403`.
+- Disabled users are rejected with `403`. `AccountStatusService.set_active`
+  locks the user row, revokes every session and changes `is_active` in one
+  commit. Sessions are revoked on both disable and re-enable, so credentials
+  issued before the change stay invalid.
+- An ORM `before_flush` guard applies the same contract to any other ORM write
+  of `User.is_active`: it takes the user-row lock and revokes sessions in the
+  same transaction. Future status-change code therefore cannot silently leave
+  usable sessions behind.
+- Refresh rotation takes the same user-row lock before rotating, so a refresh
+  cannot create a session that survives a concurrent disable.
+- The guard covers ORM unit-of-work writes only. Raw SQL and Core bulk
+  `UPDATE` statements bypass it and remain an operational limitation. When a
+  disabled account then presents an access or refresh token, the application
+  still revokes its sessions and rejects the request with `403`; the
+  credentials stay invalid after re-enable.
 
 ## Refresh tokens and sessions
 
@@ -63,8 +96,9 @@ Deployment notes:
 - Access token: in memory only.
 - Refresh token: `expo-secure-store`, backed by the iOS keychain or Android
   keystore, with `AFTER_FIRST_UNLOCK` accessibility.
-- The refresh token is returned in JSON only when the client sends
-  `X-Client-Platform: mobile`; browsers receive `null` in the body.
+- The refresh token is returned in JSON when the refresh request supplies it
+  in the request body (the mobile flow). A cookie-authenticated refresh never
+  returns it in the body, regardless of the `X-Client-Platform` header.
 - The Expo web preview has no SecureStore, so it keeps the refresh token in
   memory for that session only. This is a preview concession, not the native
   behaviour.
@@ -76,7 +110,11 @@ Deployment notes:
 3. On `401`, the client refreshes once and retries the request once.
 4. If refresh fails, local credentials are cleared and the UI returns to sign-in.
 5. Logout revokes the session server-side, clears the cookie or SecureStore entry
-   and clears in-memory state. The web app shows a confirmation notice.
+   and clears in-memory state. The web app shows a confirmation notice only
+   after the backend confirms revocation; a failed request keeps the browser
+   session active and surfaces an error instead. Mobile clears device
+   credentials even when the server is unreachable, but tells the user that
+   server-side revocation could not be confirmed.
 
 ## Transport and headers
 
@@ -96,15 +134,19 @@ Deployment notes:
 - Every protected route resolves the `User` from the authenticated session.
 - Profile and preference reads and writes use that user object; no endpoint takes
   a user ID from the request body or path.
+- Phase 2 repositories scope connections, accounts, transactions, bills,
+  subscriptions, payments and sync jobs by `user_id`. Another user's record
+  resolves as `404`.
 - Session lookup verifies that the session's `user_id` matches the token's
   `sub`.
 
-## Not implemented in Phase 1
+## Not implemented
 
 - Password reset and change-password flows.
 - Email verification.
 - Multi-factor authentication.
-- Login rate limiting and account lockout (a `RateLimitError` type is reserved).
+- Account lockout and distributed rate limiting; the limiter runs
+  in-process per backend worker.
 - Account deletion and data export.
 - Audit log UI.
 - Device/session management UI.

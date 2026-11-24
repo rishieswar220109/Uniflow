@@ -1,14 +1,24 @@
 # Phase 1 — Project Foundation and Authentication
 
-**Status:** Complete for the Phase 1 scope, with the explicit limitations listed
-below.
+**Status:** Complete and formally closed on 18 November 2026, with the explicit
+limitations listed below. Phase 2 may begin.
 
-**Verified on:** 17 November 2026
+**Independent review:** FINAL PASS on 18 November 2026 — no blocking findings.
+The reviewer inspected the current working tree read-only, including the
+post-audit delta (raw-SQL account-status regression test, `.env.example` Vite
+proxy correction and documentation updates).
 
-Phase 1 establishes the shared foundation for AI Payment Guardian: a FastAPI and
+**Verified on:** 17–18 November 2026
+
+Phase 1 establishes the shared foundation for UniFlow: a FastAPI and
 PostgreSQL backend, secure authentication and sessions, a React web app, an Expo
 mobile app, local Docker infrastructure and tests. No Phase 2 banking, financial
 or AI functionality has been started.
+
+> **Phase 2 note (20 November 2026):** Phase 2 bank integration and financial
+> data management has since been implemented. See
+> [`PHASE_2_PROGRESS.md`](PHASE_2_PROGRESS.md). This document remains the
+> historical Phase 1 closure record.
 
 ## Requirement checklist
 
@@ -25,6 +35,7 @@ or AI functionality has been started.
 | Token and session management | Complete | Short-lived JWT access tokens bound to server-side sessions |
 | Secure refresh handling | Complete | Rotating refresh tokens; only SHA-256 hashes stored |
 | Protected endpoints | Complete | Bearer dependency validates the token and session state |
+| Authentication rate limiting | Complete | Per-IP, per-action limit on login, registration and refresh; `429` with `Retry-After` |
 | User-level data isolation | Complete | Profile and preferences are always scoped to the authenticated user |
 | Centralised exception handling | Complete | Consistent JSON error shape; internal details hidden |
 | Input validation | Complete | Pydantic schemas and matching client-side validation |
@@ -38,8 +49,8 @@ or AI functionality has been started.
 | Responsive layouts | Complete | Web desktop/mobile layouts; mobile safe-area layouts |
 | CORS and security headers | Complete | Configurable origins, nosniff, frame denial, referrer and permissions policies |
 | Docker Compose | Complete | PostgreSQL and backend with health checks and startup migrations |
-| Backend tests | Complete | 31 tests, passing on SQLite and PostgreSQL |
-| Web tests | Complete | 31 tests across 6 files |
+| Backend tests | Complete | 65 passed on SQLite (3 PostgreSQL-only skipped); 68 passed on PostgreSQL |
+| Web tests | Complete | 36 tests across 7 files |
 | Integration flow | Complete | Register → session restore → profile/preferences → logout → protected-route rejection |
 | Documentation | Complete | Root README, this progress file and `docs/` |
 
@@ -59,22 +70,24 @@ Two small additions support a secure, usable foundation without starting Phase 2
 
 ```text
 .\.venv\Scripts\python -m pytest -q
-31 passed
+65 passed, 3 skipped
 ```
 
 Run twice: once with the default isolated SQLite database and once with
-`TEST_DATABASE_URL` pointing at the PostgreSQL `guardian_test` database. Both
-runs reported 31 passed.
+`TEST_DATABASE_URL` pointing at the PostgreSQL `guardian_test` database. The
+PostgreSQL run reported `68 passed`; the three SQLite skips are concurrency
+tests that require PostgreSQL `SELECT ... FOR UPDATE`.
 
 Coverage includes registration, duplicate emails, password rules, login,
 invalid credentials, refresh rotation, replay of a revoked refresh token,
 logout, expired/invalid/revoked access tokens, inactive users, profile and
-preference updates, health reporting, CORS behaviour and per-user isolation.
+preference updates, health reporting, CORS behaviour, per-user isolation and
+authentication rate limiting.
 
 ### Web
 
 ```text
-npm test -- --run   → 6 test files, 31 tests passed
+npm test -- --run   → 7 test files, 36 tests passed
 npm run lint        → 1 warning (Fast Refresh only-export-components)
 npm run build       → succeeds
 ```
@@ -136,7 +149,13 @@ These items are deliberately **not** marked complete:
   export and the browser smoke test of that export.
 - **Real bank integration:** out of scope for Phase 1.
 - **Email delivery, password reset, email verification, account deletion and
-  rate limiting:** not implemented in Phase 1.
+  MFA:** not implemented in Phase 1.
+- **Rate limiting scope:** login, registration and refresh are limited per
+  client IP within one backend process. A multi-worker or multi-replica
+  deployment must add an edge or shared limiter. Account lockout is not
+  implemented. In-memory counters reset on restart, idle keys are not swept,
+  and the refresh allowance is shared by every client behind the same address;
+  tune the defaults for NAT or heavy reload use.
 - **Production deployment:** Docker Compose is a local development stack; no
   production hosting, TLS termination or CI pipeline is configured yet.
 - **Web lint:** one Fast Refresh warning remains in `AuthContext.tsx`. It does

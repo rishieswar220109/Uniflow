@@ -1,10 +1,12 @@
 # Mobile Application
 
-Expo (React Native) client for AI Payment Guardian, built with Expo Router and
+Expo (React Native) client for UniFlow, built with Expo Router and
 TypeScript.
 
-Phase 1 provides Welcome, Register, Login, Dashboard, Profile and Settings
-screens. The dashboard intentionally shows no financial data.
+Phases 1 and 2 are implemented: authentication, profile and settings, plus
+consent-based accounts, transactions, bills, subscriptions, upcoming payments
+and a dashboard summary. The financial data comes from the mock provider and is
+labelled as mock throughout. No payment is executed and no AI feature exists yet.
 
 ## Run
 
@@ -33,8 +35,9 @@ npx tsc --noEmit
 npx expo export --platform web
 ```
 
-There is no automated mobile test suite yet. See
-`../phases/PHASE_1_PROGRESS.md` for what has and has not been verified.
+There is no automated mobile test suite yet. Phase 2 verification is limited to
+TypeScript; see [`../phases/PHASE_2_PROGRESS.md`](../phases/PHASE_2_PROGRESS.md)
+for what has and has not been verified.
 
 ## Structure
 
@@ -45,12 +48,16 @@ app/                  Expo Router screens
 ├── register.tsx
 ├── (app)/            Authenticated tabs
 │   ├── _layout.tsx   Tab navigator and auth guard
-│   ├── dashboard.tsx
+│   ├── dashboard.tsx Summary, due soon and recent activity
+│   ├── accounts.tsx  Connect, sync, revoke and balances
+│   ├── transactions.tsx Filter, add, edit and delete transactions
+│   ├── payments.tsx  Bills, subscriptions, upcoming and suggestions
 │   ├── profile.tsx
 │   └── settings.tsx
 └── +not-found.tsx
 src/
 ├── components/ui/    Shared UI primitives
+├── components/finance/ Finance-specific components
 ├── features/auth/    Auth context and validation
 ├── services/         Axios client, API wrappers, secure storage
 ├── theme/            Colours and theme hook
@@ -62,8 +69,9 @@ src/
 - Access token: in memory only.
 - Refresh token: `expo-secure-store` (keychain/keystore), with rotation on every
   refresh.
-- Requests send `X-Client-Platform: mobile` so the backend returns the refresh
-  token in JSON.
+- Mobile registration and login send `X-Client-Platform: mobile` so the backend
+  returns the refresh token in JSON. On refresh, the token is sent in the
+  request body and the rotated token is returned in JSON.
 - A 401 triggers one refresh-and-retry. A second failure clears the session and
   returns to sign-in.
 - The Expo **web** preview has no SecureStore, so it keeps the refresh token in
@@ -71,6 +79,10 @@ src/
 
 ## Notes
 
+- Bill and subscription payments are records only; no money moves.
+- `autopay` is a stored preference and reminder lead times are shown, but no
+  notification is delivered.
+- Mock data is flagged in the UI. Only the mock bank provider is bundled.
 - `app.json` must remain valid JSON and `package.json` must stay BOM-free.
 - Static hosting of an Expo web export needs SPA fallback for deep links.
 - Native device/emulator execution and SecureStore on a real keychain remain
