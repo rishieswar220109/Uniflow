@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.core.database import dispose_engine
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
+from app.services.account_status_guard import register_account_status_guard
 
 
 @asynccontextmanager
@@ -22,12 +23,15 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
+    register_account_status_guard()
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
         description=(
-            "Secure foundation API for AI Payment Guardian. Phase 1 provides "
-            "authentication, user profiles and preferences."
+            "Secure API for UniFlow. Phase 1 provides "
+            "authentication, user profiles and preferences. Phase 2 adds "
+            "consent-based bank connections, accounts, transactions, bills, "
+            "subscriptions and the unified financial overview."
         ),
         lifespan=lifespan,
         docs_url=None if settings.is_production else "/docs",

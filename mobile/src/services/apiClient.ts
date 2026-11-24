@@ -117,15 +117,35 @@ export async function startSession(response: AuthResponse): Promise<void> {
   setAccessToken(response.access_token)
 }
 
+/**
+ * The device has been signed out locally, but the backend could not confirm
+ * that the server-side session was revoked. Local credentials are still
+ * cleared; callers must tell the user that the server session may persist.
+ */
+export class LogoutServerError extends Error {
+  constructor() {
+    super('The server could not confirm that the session was revoked.')
+    this.name = 'LogoutServerError'
+  }
+}
+
 export async function finishSession(): Promise<void> {
   const refreshToken = await getStoredRefreshToken()
+  let serverRevoked = false
   try {
     await api.post('/auth/logout', { refresh_token: refreshToken ?? undefined })
+    serverRevoked = true
   } catch {
-    // Local credentials are cleared even when the network is unavailable.
-  } finally {
-    await clearLocalSession()
-    notifySessionExpired()
+    // Device credentials are cleared below even when the server is
+    // unreachable, so the refresh token cannot keep being used here.
+    serverRevoked = false
+  }
+
+  await clearLocalSession()
+  notifySessionExpired()
+
+  if (!serverRevoked) {
+    throw new LogoutServerError()
   }
 }
 

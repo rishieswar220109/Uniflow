@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 
 import {
   BellIcon,
@@ -107,7 +108,7 @@ export function SettingsPage() {
           <span className="page-kicker">Workspace</span>
           <h1 className="page-title">Settings</h1>
           <p className="page-subtitle">
-            Choose how Guardian presents and communicates information. These
+            Choose how UniFlow presents and communicates information. These
             preferences are shared by the web and mobile applications.
           </p>
         </div>
@@ -131,7 +132,7 @@ export function SettingsPage() {
             <div className="section-heading">
               <h2 id="regional-title">Regional &amp; display</h2>
               <p>
-                Guardian will use these when presenting amounts, dates and
+                UniFlow will use these when presenting amounts, dates and
                 forecasts.
               </p>
             </div>
@@ -270,10 +271,30 @@ export function SettingsPage() {
               <h2 className="card-title">One account, two apps</h2>
             </div>
             <p className="muted-note" style={{ lineHeight: 1.65 }}>
-              The web and mobile apps use the same Guardian account. Saving here
+              The web and mobile apps use the same UniFlow account. Saving here
               updates the preference stored on the backend, so your next mobile
               session reflects the same choices.
             </p>
+          </section>
+
+          <section className="card">
+            <div className="inline" style={{ marginBottom: 14 }}>
+              <span className="feature-icon">
+                <BellIcon size={18} />
+              </span>
+              <h2 className="card-title">Spending awareness</h2>
+            </div>
+            <p className="muted-note" style={{ lineHeight: 1.65 }}>
+              Thresholds, advance-reminder days and entertainment categories are
+              managed separately from the account preferences on this page.
+            </p>
+            <Link
+              className="btn btn-secondary btn-sm"
+              to="/spending-preferences"
+              style={{ marginTop: 12 }}
+            >
+              Open spending preferences
+            </Link>
           </section>
 
           <section className="card">
@@ -286,7 +307,7 @@ export function SettingsPage() {
             <p className="muted-note" style={{ lineHeight: 1.65 }}>
               Notification delivery, bill reminders and low-balance alerts are
               part of Phase 5. Your choices now are stored as preferences and do
-              not trigger messages.
+              not trigger alerts.
             </p>
           </section>
 
@@ -297,7 +318,7 @@ export function SettingsPage() {
             </div>
             <ul className="stack-sm" style={{ margin: 0, paddingLeft: 18 }}>
               <li className="muted-note">
-                <LockIcon size={12} /> Guardian never asks for banking
+                <LockIcon size={12} /> UniFlow never asks for banking
                 credentials.
               </li>
               <li className="muted-note">

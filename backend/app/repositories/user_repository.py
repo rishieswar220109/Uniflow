@@ -15,6 +15,22 @@ class UserRepository:
     def get_by_id(self, user_id: uuid.UUID) -> User | None:
         return self.db.get(User, user_id, options=[selectinload(User.preferences)])
 
+    def get_by_id_for_update(self, user_id: uuid.UUID) -> User | None:
+        """Load a user while holding a row lock.
+
+        ``populate_existing`` refreshes attributes already present in the
+        identity map, so a caller that waited on the lock observes the status
+        committed by the transaction that held it.
+        """
+
+        statement = (
+            select(User)
+            .where(User.id == user_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+        return self.db.execute(statement).scalar_one_or_none()
+
     def get_by_email(self, email: str) -> User | None:
         statement = (
             select(User)

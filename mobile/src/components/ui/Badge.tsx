@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { radius, spacing } from '../../theme'
 import { useAppTheme } from '../../theme/useAppTheme'
 
-type BadgeTone = 'success' | 'neutral' | 'warning' | 'primary'
+type BadgeTone = 'success' | 'neutral' | 'warning' | 'primary' | 'danger'
 
 export function Badge({
   label,
@@ -21,6 +21,7 @@ export function Badge({
     neutral: { bg: colors.surfaceMuted, fg: colors.muted },
     warning: { bg: colors.warningSoft, fg: colors.warning },
     primary: { bg: colors.primarySoft, fg: colors.primarySoftText },
+    danger: { bg: colors.dangerSoft, fg: colors.danger },
   }[tone]
 
   return (

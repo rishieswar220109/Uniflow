@@ -13,6 +13,7 @@ from app.core.exceptions import ForbiddenError, UnauthorizedError
 from app.core.security import decode_access_token
 from app.models.user import User
 from app.repositories.auth_session_repository import AuthSessionRepository
+from app.services.account_status import revoke_sessions_for_disabled_user
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -44,16 +45,21 @@ def get_current_user(
     session = AuthSessionRepository(db).get_by_id(session_id)
     if session is None or session.user_id != user_id:
         raise UnauthorizedError("Session is no longer valid")
+
+    user = session.user
+    if user is None or user.id != user_id:
+        raise UnauthorizedError("Session is no longer valid")
+    if not user.is_active:
+        # Status changes revoke sessions atomically, but the first request
+        # after a disable must still report the disabled account explicitly
+        # instead of looking like a merely invalid token.
+        revoke_sessions_for_disabled_user(db, user.id)
+        raise ForbiddenError("This account has been disabled")
+
     if session.revoked_at is not None:
         raise UnauthorizedError("Session is no longer valid")
     if not session.is_active:
         raise UnauthorizedError("Session has expired")
-
-    user = session.user
-    if user.id != user_id:
-        raise UnauthorizedError("Session is no longer valid")
-    if not user.is_active:
-        raise ForbiddenError("This account has been disabled")
     return user
 
 

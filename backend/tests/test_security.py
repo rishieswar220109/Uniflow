@@ -1,10 +1,12 @@
 """Unit tests for password hashing and token primitives."""
 
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import jwt
 import pytest
 
+from app.core.config import settings
 from app.core.security import (
     create_access_token,
     decode_access_token,
@@ -70,4 +72,21 @@ def test_token_with_bad_signature_is_rejected() -> None:
         algorithm="HS256",
     )
     with pytest.raises(jwt.InvalidTokenError):
+        decode_access_token(token)
+
+
+def test_expired_access_token_is_rejected() -> None:
+    now = datetime.now(UTC)
+    token = jwt.encode(
+        {
+            "sub": str(uuid.uuid4()),
+            "sid": str(uuid.uuid4()),
+            "type": "access",
+            "iat": now - timedelta(minutes=2),
+            "exp": now - timedelta(seconds=1),
+        },
+        settings.jwt_secret_key,
+        algorithm=settings.jwt_algorithm,
+    )
+    with pytest.raises(jwt.ExpiredSignatureError):
         decode_access_token(token)

@@ -1,41 +1,66 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../features/auth/AuthContext'
+import { extractApiError } from '../../utils/errors'
 import { initials } from '../../utils/format'
 import {
+  BellIcon,
   CalendarIcon,
   HomeIcon,
+  LandmarkIcon,
   LogoutIcon,
   SettingsIcon,
   SparklesIcon,
+  TargetIcon,
   TrendIcon,
   UserIcon,
   WalletIcon,
 } from '../icons'
+import { Alert } from '../ui/Alert'
 import { Logo } from '../ui/Logo'
 
 const primaryNav = [
   { to: '/dashboard', label: 'Dashboard', icon: HomeIcon },
+  { to: '/accounts', label: 'Accounts', icon: LandmarkIcon },
+  { to: '/transactions', label: 'Transactions', icon: WalletIcon },
+  { to: '/bills', label: 'Bills', icon: BellIcon },
+  { to: '/subscriptions', label: 'Subscriptions', icon: SparklesIcon },
+  { to: '/upcoming', label: 'Upcoming', icon: CalendarIcon },
+  { to: '/budgets', label: 'Budgets', icon: TargetIcon },
+  { to: '/intelligence', label: 'Intelligence', icon: TrendIcon },
+  { to: '/reports', label: 'Reports', icon: TrendIcon },
   { to: '/profile', label: 'Profile', icon: UserIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ]
 
-const upcomingNav = [
-  { label: 'Transactions', icon: WalletIcon },
-  { label: 'Payments', icon: CalendarIcon },
-  { label: 'Insights', icon: TrendIcon },
-  { label: 'Ask Guardian', icon: SparklesIcon },
+const laterNav = [
+  { label: 'Ask UniFlow', icon: SparklesIcon, phase: 'Phase 4' },
 ]
 
 export function AppShell() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [signingOut, setSigningOut] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
 
   if (!user) return null
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login', { replace: true })
+    if (signingOut) return
+    setSigningOut(true)
+    setLogoutError('')
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (error) {
+      setLogoutError(
+        'We could not confirm your sign-out. Your session may still be active. ' +
+          extractApiError(error, 'Please try again.'),
+      )
+    } finally {
+      setSigningOut(false)
+    }
   }
 
   return (
@@ -60,16 +85,16 @@ export function AppShell() {
               </NavLink>
             </li>
           ))}
-          {upcomingNav.map(({ label, icon: Icon }) => (
+          {laterNav.map(({ label, icon: Icon, phase }) => (
             <li key={label}>
               <span
                 className="nav-link nav-link-disabled"
                 aria-disabled="true"
-                title="Available in a later phase"
+                title={`Available in ${phase}`}
               >
                 <Icon size={18} />
                 {label}
-                <span className="nav-soon">Soon</span>
+                <span className="nav-soon">{phase}</span>
               </span>
             </li>
           ))}
@@ -91,9 +116,11 @@ export function AppShell() {
             type="button"
             className="sidebar-signout"
             onClick={handleLogout}
+            disabled={signingOut}
+            aria-busy={signingOut}
           >
             <LogoutIcon size={15} />
-            Sign out
+            {signingOut ? 'Signing out…' : 'Sign out'}
           </button>
         </div>
       </aside>
@@ -104,7 +131,7 @@ export function AppShell() {
           <div className="topbar-context">
             <strong>Workspace</strong>
             <span>/</span>
-            <span>Phase 1 · Secure foundation</span>
+            <span>Phase 3 · Financial intelligence</span>
           </div>
           <div className="topbar-actions">
             <span className="badge badge-success">Session secured</span>
@@ -118,6 +145,8 @@ export function AppShell() {
               type="button"
               className="icon-button topbar-signout"
               onClick={handleLogout}
+              disabled={signingOut}
+              aria-busy={signingOut}
               aria-label="Sign out"
             >
               <LogoutIcon size={17} />
@@ -126,6 +155,11 @@ export function AppShell() {
         </header>
 
         <main id="main-content" className="page-content">
+          {logoutError ? (
+            <div style={{ marginBottom: 18 }}>
+              <Alert variant="error">{logoutError}</Alert>
+            </div>
+          ) : null}
           <Outlet />
         </main>
       </div>

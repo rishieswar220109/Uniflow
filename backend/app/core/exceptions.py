@@ -1,6 +1,7 @@
 """Centralised application exceptions and FastAPI error handlers."""
 
 import logging
+import math
 from typing import Any
 
 from fastapi import FastAPI, Request, status
@@ -58,6 +59,21 @@ class ConflictError(AppError):
 class RateLimitError(AppError):
     status_code = status.HTTP_429_TOO_MANY_REQUESTS
     code = "rate_limited"
+
+    def __init__(
+        self,
+        message: str = "Too many requests",
+        *,
+        retry_after: float | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.retry_after = retry_after
+
+    @property
+    def headers(self) -> dict[str, str]:
+        if self.retry_after is None:
+            return {}
+        return {"Retry-After": str(max(1, math.ceil(self.retry_after)))}
 
 
 def _error_response(

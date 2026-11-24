@@ -43,6 +43,45 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="accounts"
+        options={{
+          title: 'Accounts',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="business-outline"
+              color={color as string}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="transactions"
+        options={{
+          title: 'Activity',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="wallet-outline"
+              color={color as string}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="payments"
+        options={{
+          title: 'Payments',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="calendar-outline"
+              color={color as string}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
@@ -54,10 +93,55 @@ export default function AppLayout() {
       <Tabs.Screen
         name="settings"
         options={{
+          href: null,
           title: 'Settings',
+        }}
+      />
+      <Tabs.Screen
+        name="budgets"
+        options={{
+          title: 'Budgets',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" color={color as string} size={size} />
+            <Ionicons
+              name="wallet-outline"
+              color={color as string}
+              size={size}
+            />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="intelligence"
+        options={{
+          title: 'UniFlow',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="sparkles-outline"
+              color={color as string}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="savings-goals"
+        options={{
+          href: null,
+          title: 'Savings goals',
+        }}
+      />
+      <Tabs.Screen
+        name="spending-preferences"
+        options={{
+          href: null,
+          title: 'Spending preferences',
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          href: null,
+          title: 'Financial reports',
         }}
       />
     </Tabs>

@@ -65,7 +65,9 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"
     expires_in: int
-    # Only returned to mobile clients; browsers rely on the httpOnly cookie.
+    # Cookie-authenticated browser refreshes never return a refresh token here.
+    # Mobile registration/login and body-token refreshes receive it for
+    # storage in SecureStore.
     refresh_token: str | None = None
     user: UserRead
 

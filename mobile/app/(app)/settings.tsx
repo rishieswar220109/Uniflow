@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Alert as NativeAlert,
   Pressable,
@@ -42,6 +42,7 @@ export default function SettingsScreen() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [signingOut, setSigningOut] = useState(false)
+  const signingOutRef = useRef(false)
 
   if (!user) return null
 
@@ -63,21 +64,44 @@ export default function SettingsScreen() {
     }
   }
 
+  const performSignOut = async () => {
+    if (signingOutRef.current) return
+    signingOutRef.current = true
+    setSigningOut(true)
+
+    let serverRevoked = true
+    try {
+      await logout()
+    } catch {
+      serverRevoked = false
+    } finally {
+      signingOutRef.current = false
+      setSigningOut(false)
+    }
+
+    router.replace('/login')
+
+    if (!serverRevoked) {
+      NativeAlert.alert(
+        'Signed out on this device',
+        'We could not confirm that the session ended on the server. It will ' +
+          'expire automatically. Check your connection before signing in ' +
+          'again.',
+      )
+    }
+  }
+
   const confirmSignOut = () => {
     NativeAlert.alert(
       'Sign out?',
-      'You will need to sign in again to access your Guardian workspace.',
+      'You will need to sign in again to access your UniFlow workspace.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Sign out',
           style: 'destructive',
           onPress: () => {
-            void (async () => {
-              setSigningOut(true)
-              await logout()
-              router.replace('/login')
-            })()
+            void performSignOut()
           },
         },
       ],
@@ -153,7 +177,7 @@ export default function SettingsScreen() {
               Notifications
             </Text>
             <Text style={[styles.sectionCopy, { color: colors.muted }]}>
-              Choose what Guardian may send when alerts launch in later phases.
+              Choose what UniFlow may send when alerts launch in later phases.
             </Text>
           </View>
         </View>
@@ -221,6 +245,22 @@ export default function SettingsScreen() {
 
       <Card>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Spending awareness
+        </Text>
+        <Text style={[styles.sectionCopy, { color: colors.muted }]}>
+          Thresholds, advance-reminder days and entertainment categories are
+          managed separately from the preferences above.
+        </Text>
+        <Button
+          label="Open spending preferences"
+          compact
+          variant="secondary"
+          onPress={() => router.push('/spending-preferences')}
+        />
+      </Card>
+
+      <Card>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Security &amp; session
         </Text>
         <View style={styles.infoRow}>
@@ -253,7 +293,7 @@ export default function SettingsScreen() {
       </Card>
 
       <Text style={[styles.footer, { color: colors.subtle }]}>
-        AI Payment Guardian · Phase 1 secure foundation
+        UniFlow · Phase 3 financial intelligence
       </Text>
     </Screen>
   )

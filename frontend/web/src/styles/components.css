@@ -365,6 +365,11 @@
   color: var(--primary-soft-text);
 }
 
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
 .badge-plain::before {
   display: none;
 }

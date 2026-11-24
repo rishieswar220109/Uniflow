@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     )
 
     # Application
-    app_name: str = "AI Payment Guardian API"
+    app_name: str = "UniFlow API"
     app_version: str = "1.0.0"
     environment: Literal["development", "test", "production"] = "development"
     debug: bool = False
@@ -48,6 +48,16 @@ class Settings(BaseSettings):
     refresh_cookie_secure: bool = False
     refresh_cookie_samesite: Literal["lax", "strict", "none"] = "lax"
     refresh_cookie_path: str = "/api/v1/auth"
+    # Per-client-IP rate limiting for authentication endpoints. The limiter is
+    # in-process; multi-worker deployments also need an edge or shared limiter.
+    auth_rate_limit_enabled: bool = True
+    auth_rate_limit_attempts: int = 10
+    auth_rate_limit_window_seconds: int = 300
+
+    # Financial data providers (Phase 2). Only the mock provider is bundled.
+    # A live provider is added by registering another BankProvider adapter.
+    bank_provider: str = "mock"
+    bank_sync_lookback_days: int = 120
 
     # CORS (comma-separated in .env, e.g. "http://localhost:5173,http://localhost:8081")
     cors_origins: Annotated[list[str], NoDecode] = [
@@ -71,6 +81,20 @@ class Settings(BaseSettings):
             return "postgresql+psycopg://" + value.removeprefix("postgres://")
         if value.startswith("postgresql://"):
             return "postgresql+psycopg://" + value.removeprefix("postgresql://")
+        return value
+
+    @field_validator("auth_rate_limit_attempts", "auth_rate_limit_window_seconds")
+    @classmethod
+    def validate_rate_limit_values(cls, value: int) -> int:
+        if value < 1:
+            raise ValueError("Rate limit values must be positive")
+        return value
+
+    @field_validator("bank_sync_lookback_days")
+    @classmethod
+    def validate_sync_lookback(cls, value: int) -> int:
+        if value < 1 or value > 3650:
+            raise ValueError("Bank sync lookback must be between 1 and 3650 days")
         return value
 
     @model_validator(mode="after")

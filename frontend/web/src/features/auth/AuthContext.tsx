@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -25,6 +26,10 @@ export interface AuthContextValue {
   signedOutNotice: boolean
   login: (input: LoginInput) => Promise<void>
   register: (input: RegisterInput) => Promise<void>
+  /**
+   * Revokes the server session and clears local state. Rejects when the
+   * server could not confirm revocation, leaving the browser session intact.
+   */
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
   updateUser: (user: User) => void
@@ -118,17 +123,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [completeAuthentication],
   )
 
-  const logout = useCallback(async () => {
-    try {
+  const logoutPromise = useRef<Promise<void> | null>(null)
+
+  const logout = useCallback(() => {
+    const inFlight = logoutPromise.current
+    if (inFlight) return inFlight
+
+    // The browser refresh token lives in an HttpOnly cookie that only the
+    // backend can clear. If revocation fails, the session is still active, so
+    // keep the authenticated state and let the caller report the failure
+    // instead of showing a false sign-out confirmation.
+    const operation = (async () => {
       await authApi.logout()
-    } catch {
-      // Local state is cleared even if the network request fails.
-    } finally {
       setAccessToken(null)
       setUser(null)
       setStatus('unauthenticated')
       setSignedOutNotice(true)
-    }
+    })().finally(() => {
+      logoutPromise.current = null
+    })
+
+    logoutPromise.current = operation
+    return operation
   }, [])
 
   const refreshUser = useCallback(async () => {

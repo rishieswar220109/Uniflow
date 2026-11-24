@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { Alert } from '../../src/components/ui/Alert'
 import { Badge } from '../../src/components/ui/Badge'
@@ -18,6 +19,7 @@ import { formatDate, initials } from '../../src/utils/format'
 export default function ProfileScreen() {
   const { user, updateUser } = useAuth()
   const { colors } = useAppTheme()
+  const router = useRouter()
   const [fullName, setFullName] = useState(user?.full_name ?? '')
   const [error, setError] = useState<string | null>(null)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -68,7 +70,7 @@ export default function ProfileScreen() {
       <View style={styles.heading}>
         <Text style={[styles.title, { color: colors.text }]}>Your profile</Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Keep your Guardian identity accurate. Only you can access this account.
+          Keep your UniFlow identity accurate. Only you can access this account.
         </Text>
       </View>
 
@@ -174,6 +176,36 @@ export default function ProfileScreen() {
         />
       </Card>
 
+      <Card>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/settings')}
+          style={({ pressed }) => [
+            styles.settingsRow,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <View
+            style={[styles.securityIcon, { backgroundColor: colors.primarySoft }]}
+          >
+            <Ionicons
+              name="options-outline"
+              size={20}
+              color={colors.primary}
+            />
+          </View>
+          <View style={styles.securityCopy}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              Preferences &amp; settings
+            </Text>
+            <Text style={[styles.sectionCopy, { color: colors.muted }]}>
+              Currency, timezone, theme and notification preferences.
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.subtle} />
+        </Pressable>
+      </Card>
+
       <Card muted>
         <View style={styles.securityRow}>
           <View
@@ -190,7 +222,7 @@ export default function ProfileScreen() {
               This account belongs to you
             </Text>
             <Text style={[styles.sectionCopy, { color: colors.muted }]}>
-              API requests are scoped to your authenticated session. Guardian
+              API requests are scoped to your authenticated session. UniFlow
               never shares your profile with another account.
             </Text>
           </View>
@@ -309,6 +341,11 @@ const styles = StyleSheet.create({
   securityRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.md,
   },
   securityIcon: {

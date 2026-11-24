@@ -39,6 +39,7 @@ else:
     os.environ["DATABASE_URL"] = f"sqlite+pysqlite:///{sqlite_path.as_posix()}"
 
 from app.core.database import Base, get_db  # noqa: E402
+from app.core.rate_limit import auth_rate_limiter  # noqa: E402
 from app.main import app  # noqa: E402
 from app import models as _models  # noqa: E402,F401
 
@@ -64,6 +65,15 @@ def _database_schema() -> Generator[None, None, None]:
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter() -> Generator[None, None, None]:
+    """Keep per-IP auth buckets from leaking between tests."""
+
+    auth_rate_limiter.reset()
+    yield
+    auth_rate_limiter.reset()
 
 
 @pytest.fixture

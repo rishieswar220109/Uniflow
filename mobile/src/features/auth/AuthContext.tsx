@@ -31,6 +31,10 @@ export interface AuthContextValue {
   status: AuthStatus
   login: (input: LoginInput) => Promise<void>
   register: (input: RegisterInput) => Promise<void>
+  /**
+   * Revokes the server session and clears device credentials. Rejects when the
+   * server could not confirm revocation; device credentials are still cleared.
+   */
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
   updateUser: (user: User) => void
@@ -95,9 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const logout = useCallback(async () => {
-    await finishSession()
-    setUser(null)
-    setStatus('unauthenticated')
+    try {
+      await finishSession()
+    } finally {
+      // Local state is cleared even when server revocation cannot be
+      // confirmed. finishSession rejects so the UI can report that clearly.
+      setUser(null)
+      setStatus('unauthenticated')
+    }
   }, [])
 
   const refreshUser = useCallback(async () => {

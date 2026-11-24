@@ -91,7 +91,7 @@ class AuthService:
             raise UnauthorizedError("Missing refresh token")
 
         session = self.sessions.get_by_token_hash(
-            hash_refresh_token(raw_refresh_token)
+            hash_refresh_token(raw_refresh_token), for_update=True
         )
         if session is None:
             raise UnauthorizedError("Invalid or expired session")

@@ -1,9 +1,16 @@
 """Registration, login, refresh, logout and protected-route behaviour."""
 
+import threading
+import time
+from datetime import timedelta
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import UnauthorizedError
+from app.core.security import hash_refresh_token, utcnow
 from app.models.user import AuthSession, User
 
 
@@ -247,3 +254,165 @@ def test_sessions_are_persisted_with_hashed_refresh_tokens(
     assert len(sessions) == 1
     assert sessions[0].refresh_token_hash != raw_refresh
     assert len(sessions[0].refresh_token_hash) == 64
+
+
+def test_disabled_account_cannot_login_or_use_existing_tokens(
+    client: TestClient, db: Session
+) -> None:
+    registration = client.post(
+        "/api/v1/auth/register",
+        json={
+            "full_name": "Disabled User",
+            "email": "disabled@example.com",
+            "password": "SecurePass123",
+        },
+        headers={"X-Client-Platform": "mobile"},
+    )
+    body = registration.json()
+
+    user = db.execute(
+        select(User).where(User.email == "disabled@example.com")
+    ).scalar_one()
+    user.is_active = False
+    db.commit()
+
+    headers = {"Authorization": f"Bearer {body['access_token']}"}
+    assert client.get("/api/v1/users/me", headers=headers).status_code == 403
+
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "disabled@example.com", "password": "SecurePass123"},
+    )
+    assert login.status_code == 403
+    assert login.json()["detail"] == "This account has been disabled"
+
+    refresh = client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": body["refresh_token"]},
+        headers={"X-Client-Platform": "mobile"},
+    )
+    assert refresh.status_code == 403
+
+
+def test_expired_refresh_session_is_rejected_and_revoked(
+    client: TestClient, db: Session
+) -> None:
+    registration = client.post(
+        "/api/v1/auth/register",
+        json={
+            "full_name": "Expired Session",
+            "email": "expired@example.com",
+            "password": "SecurePass123",
+        },
+        headers={"X-Client-Platform": "mobile"},
+    )
+    raw_refresh = registration.json()["refresh_token"]
+
+    session = db.execute(
+        select(AuthSession).where(
+            AuthSession.refresh_token_hash == hash_refresh_token(raw_refresh)
+        )
+    ).scalar_one()
+    session.expires_at = utcnow() - timedelta(seconds=1)
+    db.commit()
+
+    response = client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": raw_refresh},
+        headers={"X-Client-Platform": "mobile"},
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Session has expired"
+
+    db.refresh(session)
+    assert session.revoked_at is not None
+
+
+def test_concurrent_refresh_creates_only_one_rotation(
+    client: TestClient,
+) -> None:
+    from tests.conftest import TestingSessionLocal, engine
+
+    if engine.dialect.name != "postgresql":
+        pytest.skip(
+            "Concurrent rotation relies on PostgreSQL SELECT ... FOR UPDATE"
+        )
+
+    from sqlalchemy import text
+
+    from app.repositories.auth_session_repository import AuthSessionRepository
+    from app.services.auth_service import AuthService, RequestMetadata
+
+    registration = client.post(
+        "/api/v1/auth/register",
+        json={
+            "full_name": "Concurrent User",
+            "email": "concurrent@example.com",
+            "password": "SecurePass123",
+        },
+        headers={"X-Client-Platform": "mobile"},
+    )
+    original_refresh = registration.json()["refresh_token"]
+    token_hash = hash_refresh_token(original_refresh)
+
+    # Hold the session row lock to guarantee the racing refresh overlaps the
+    # winner instead of running before or after it.
+    blocker = TestingSessionLocal()
+    try:
+        locked = AuthSessionRepository(blocker).get_by_token_hash(
+            token_hash, for_update=True
+        )
+        assert locked is not None
+
+        outcomes: list[str] = []
+
+        def attempt() -> None:
+            session = TestingSessionLocal()
+            try:
+                service = AuthService(session)
+                try:
+                    service.refresh(original_refresh, RequestMetadata())
+                except UnauthorizedError:
+                    outcomes.append("rejected")
+                else:
+                    outcomes.append("rotated")
+            finally:
+                session.close()
+
+        thread = threading.Thread(target=attempt)
+        thread.start()
+
+        # Wait until the racing request is actually blocked on the row lock.
+        deadline = time.monotonic() + 5
+        blocked = False
+        while time.monotonic() < deadline:
+            with TestingSessionLocal() as observer:
+                waiting = observer.execute(
+                    text(
+                        "SELECT count(*) FROM pg_stat_activity "
+                        "WHERE datname = current_database() "
+                        "AND wait_event_type = 'Lock'"
+                    )
+                ).scalar_one()
+            if waiting:
+                blocked = True
+                break
+            time.sleep(0.05)
+        assert blocked, "racing refresh never blocked on the session row lock"
+
+        # The lock holder completes its rotation and commits, releasing the
+        # lock. The waiting request must then see the rotated session.
+        AuthService(blocker).refresh(original_refresh, RequestMetadata())
+        thread.join(timeout=30)
+        assert not thread.is_alive()
+    finally:
+        blocker.close()
+
+    assert outcomes == ["rejected"]
+
+    with TestingSessionLocal() as verification:
+        sessions = verification.execute(select(AuthSession)).scalars().all()
+    # The original session plus the single rotation. Replay detection revoked
+    # the family, so no usable token branch survives.
+    assert len(sessions) == 2
+    assert all(session.revoked_at is not None for session in sessions)

@@ -211,6 +211,16 @@ export function KeyIcon(props: IconProps) {
   )
 }
 
+export function TargetIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 12h.01" />
+    </Icon>
+  )
+}
+
 export function TrendIcon(props: IconProps) {
   return (
     <Icon {...props}>

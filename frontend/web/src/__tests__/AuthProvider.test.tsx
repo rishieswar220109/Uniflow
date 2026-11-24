@@ -146,4 +146,66 @@ describe('authentication state', () => {
     expect(result.current.status).toBe('unauthenticated')
     expect(result.current.user).toBeNull()
   })
+
+  it('keeps the session and withholds the notice when logout fails', async () => {
+    loginMock.mockResolvedValue(makeAuthResponse())
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    await waitFor(() => expect(result.current.status).toBe('unauthenticated'))
+    await act(async () => {
+      await result.current.login({
+        email: 'asha@example.com',
+        password: 'Guardian123',
+      })
+    })
+    setTokenMock.mockClear()
+    logoutMock.mockRejectedValueOnce(new Error('network unavailable'))
+
+    await act(async () => {
+      await expect(result.current.logout()).rejects.toThrow('network unavailable')
+    })
+
+    // The HttpOnly cookie is only cleared by the backend, so a failed request
+    // must not pretend the browser session is gone.
+    expect(result.current.status).toBe('authenticated')
+    expect(result.current.user?.email).toBe('asha@example.com')
+    expect(result.current.signedOutNotice).toBe(false)
+    expect(setTokenMock).not.toHaveBeenCalledWith(null)
+  })
+
+  it('shares one request across repeated logout attempts', async () => {
+    loginMock.mockResolvedValue(makeAuthResponse())
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    await waitFor(() => expect(result.current.status).toBe('unauthenticated'))
+    await act(async () => {
+      await result.current.login({
+        email: 'asha@example.com',
+        password: 'Guardian123',
+      })
+    })
+
+    let resolveLogout: (() => void) | undefined
+    logoutMock.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveLogout = resolve
+        }),
+    )
+
+    let first: Promise<void> = Promise.resolve()
+    let second: Promise<void> = Promise.resolve()
+    await act(async () => {
+      first = result.current.logout()
+      second = result.current.logout()
+    })
+
+    expect(logoutMock).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveLogout?.()
+      await Promise.all([first, second])
+    })
+
+    expect(result.current.status).toBe('unauthenticated')
+    expect(result.current.signedOutNotice).toBe(true)
+  })
 })
