@@ -82,6 +82,10 @@ The application must achieve the following objectives.
 13. Prepare proposed financial actions.
 14. Request user approval before consequential actions.
 15. Maintain a history of recommendations, approvals and actions.
+16. Provide Smart Tax Planning for Indian income-tax, comparing old and new tax regimes using versioned, effective-dated tax rules.
+17. Provide AI Investment Intelligence for stock market analysis, gold and silver tracking, and personalized investment suggestions, clearly distinguishing factual data, AI predictions and recommendations.
+18. Provide Unified Financial Intelligence integrating tax planning, investment intelligence and existing payment/budget data with cash-flow-aware guardrails.
+19. Detect fraudulent or suspicious investment opportunities and suspicious UPI accounts without silently blocking legitimate transactions.
 
 The application must never pretend that a simulated operation is a real bank transaction.
 
@@ -212,6 +216,46 @@ The approval process must display:
 If any important action detail changes, the previous approval must become invalid.
 
 If an authorised payment integration is unavailable, the application should provide a safe reminder or hand-off instead of simulating payment execution.
+
+## 4.8 Smart Tax Planning (ADDITION)
+
+The system must support Indian Smart Tax Planning:
+
+- Calculate estimated Indian income-tax using versioned, effective-dated tax rules for both the old and new tax regimes.
+- Apply the latest applicable tax slabs, deductions, rebates, cess and other relevant rules.
+- Store tax rules with effective dates so they can be updated when legislation changes.
+- Calculate estimated tax based on user-provided financial information (income, deductions, investments).
+- Compare the old and new tax regimes and recommend the more suitable regime based on the user's actual circumstances.
+- Explain tax calculations and assumptions transparently, showing slab breakdowns and deduction details.
+- Include tax-saving investment information (e.g., Section 80C, 80D) where applicable.
+- All tax arithmetic must be performed by deterministic backend services; the LLM may explain but never calculate tax.
+
+## 4.9 AI Investment Intelligence (ADDITION)
+
+The system must support AI Investment Intelligence:
+
+- Provide AI-powered stock-market analysis and forecasting, explaining daily market rises and declines.
+- Provide stock insights, risk analysis and potential opportunities.
+- Provide personalized investment suggestions based on financial goals, available budget and risk tolerance.
+- Track gold and silver market prices with price analysis and trading-related information.
+- Include fraud detection and suspicious investment alerts.
+- Detect suspicious UPI accounts based on the user's own payment history and user-supplied payment requests.
+- Clearly distinguish factual market data, AI-generated predictions and recommendations through explicit labeling.
+- Never guarantee returns.
+- Never execute trades without explicit, per-order user authorization.
+- Start with mock market data and a provider-independent architecture; do not commit to paid APIs before evaluating cost, licensing and reliability.
+- Investment suggestions must account for upcoming bills, subscriptions, dues, available balances and savings goals, and must not recommend investments that could compromise the user's ability to meet upcoming financial obligations.
+- False positives in fraud detection must not silently block legitimate transactions.
+
+## 4.10 Unified Financial Intelligence (ADDITION / IMPROVEMENT)
+
+The system must provide Unified Financial Intelligence:
+
+- Integrate tax planning and investment intelligence with existing payment, budget, bill and subscription data.
+- Consider upcoming bills, subscriptions, dues, available balances and savings goals before suggesting investments.
+- Avoid recommendations that could compromise the user's ability to meet upcoming financial obligations.
+- Provide a unified financial overview without compromising privacy.
+- Tax planning, stock-market intelligence, gold and silver analysis are additional capabilities and must not displace core payment-management functionality.
 
 ---
 
@@ -614,15 +658,15 @@ A reliable financial intelligence and prediction engine.
 
 ---
 
-## PHASE 4 — AI GUARDIAN AGENT AND RECOMMENDATION ENGINE
+## PHASE 4 — AI GUARDIAN AGENT, TAX PLANNING AND INVESTMENT INTELLIGENCE
 
 ### Objective
 
-Introduce the AI agent that acts as the user's intelligent financial assistant.
+Introduce the AI agent that acts as the user's intelligent financial assistant, plus the Smart Tax Planning and AI Investment Intelligence engines.
 
 The AI agent must use the financial data and intelligence services developed in earlier phases.
 
-### AI Agent Capabilities
+### AI Agent Capabilities (ORIGINAL)
 
 The agent must:
 
@@ -637,7 +681,7 @@ The agent must:
 9. Answer follow-up questions.
 10. Prepare proposed actions for user review.
 
-### Tool-Based Agent Architecture
+### Tool-Based Agent Architecture (ORIGINAL)
 
 The AI agent must not have unrestricted access to the database.
 
@@ -656,7 +700,7 @@ Example tools:
 
 Every tool must enforce user authentication, authorisation and input validation.
 
-### AI Agent Workflow
+### AI Agent Workflow (ORIGINAL)
 
 User Question
       |
@@ -681,7 +725,7 @@ Generate Explanation or Recommendation
       v
 Display Response to User
 
-### Example Questions
+### Example Questions (ORIGINAL)
 
 - How much did I spend this month?
 - What payments are due this week?
@@ -691,7 +735,7 @@ Display Response to User
 - Which payments should I prioritise?
 - How much money can I safely spend based on my recorded commitments?
 
-### AI Recommendation Engine
+### AI Recommendation Engine (ORIGINAL)
 
 Recommendations must be based on:
 
@@ -704,7 +748,37 @@ Recommendations must be based on:
 
 The AI must explain why it makes a recommendation.
 
-### Frontend Screens
+### Smart Tax Planning Engine (ADDITION)
+
+The system must implement a deterministic Indian tax calculation engine:
+
+- Support both old and new Indian income-tax regimes.
+- Use versioned, effective-dated tax rules (slabs, deductions, rebates, cess) that can be updated when legislation changes.
+- Calculate estimated tax based on user-provided financial information (income, deductions, investments).
+- Compare old vs new regimes and recommend the more suitable regime based on the user's actual circumstances.
+- Explain tax calculations and assumptions transparently (slab breakdowns, deduction details).
+- Include tax-saving investment information (e.g., Section 80C, 80D) where applicable.
+- All tax arithmetic performed by deterministic backend services; the LLM may explain but never calculate tax.
+
+### AI Investment Intelligence Engine (ADDITION)
+
+The system must implement AI-powered investment intelligence:
+
+- Stock-market analysis and forecasting, explaining daily market rises and declines.
+- Stock insights, risk analysis and potential opportunities.
+- Personalized investment suggestions based on financial goals, available budget and risk tolerance.
+- Gold and silver market tracking with price analysis and trading-related information.
+- Fraud detection and suspicious investment alerts.
+- Suspicious UPI account detection based on the user's own payment history and user-supplied payment requests.
+- Clearly distinguish factual market data, AI-generated predictions and recommendations through explicit labeling.
+- Never guarantee returns.
+- Never execute trades without explicit, per-order user authorization.
+- Start with mock market data and provider-independent architecture; do not commit to paid APIs before evaluating cost, licensing and reliability.
+- Investment suggestions must account for upcoming bills, subscriptions, dues, available balances and savings goals.
+- Avoid recommendations that could compromise the user's ability to meet upcoming financial obligations.
+- False positives in fraud detection must not silently block legitimate transactions.
+
+### Frontend Screens (ORIGINAL)
 
 - Ask Guardian.
 - Chat interface.
@@ -712,7 +786,14 @@ The AI must explain why it makes a recommendation.
 - Financial explanation screens.
 - Conversation history.
 
-### Security Requirements
+### Tax and Investment Frontend Screens (ADDITION)
+
+- Tax dashboard: regime comparison, estimated tax, tax-saving suggestions.
+- Investment screen: stock analysis, gold/silver tracker, personalized suggestions.
+- Factual vs AI-prediction vs recommendation labeling badges.
+- Disclaimers: no guaranteed returns, no trade execution without authorization.
+
+### Security Requirements (ORIGINAL)
 
 - AI must only access the authenticated user's data.
 - Do not expose unrestricted database access.
@@ -722,7 +803,15 @@ The AI must explain why it makes a recommendation.
 - Never allow AI-generated text alone to authorise payments.
 - Do not allow the AI to invent financial information.
 
-### Completion Criteria
+### Tax and Investment Security Requirements (ADDITION)
+
+- Tax data is user-provided; never shared with third parties.
+- Investment suggestions are clearly labeled as non-guaranteed.
+- No trade execution in Phase 4 (read-only analysis).
+- Market data fetched server-side only; frontend never calls external financial APIs directly.
+- Fraud detection is advisory; never silently blocks user actions.
+
+### Completion Criteria (ORIGINAL)
 
 - Users can ask financial questions.
 - The AI retrieves the correct user's financial information.
@@ -730,21 +819,28 @@ The AI must explain why it makes a recommendation.
 - Recommendations have identifiable supporting information.
 - The agent cannot independently execute consequential actions.
 
+### Tax and Investment Completion Criteria (ADDITION)
+
+- Tax calculations match known Indian tax slabs (old/new regime boundary conditions).
+- Investment insights labeled correctly (factual vs AI prediction vs recommendation).
+- Fraud alerts do not block legitimate transactions.
+- All new API endpoints require bearer auth and return 404 for cross-user access.
+
 ### Expected Deliverable
 
-A functional AI financial assistant with controlled tools and recommendation capabilities.
+A functional AI financial assistant with controlled tools, recommendation capabilities, Smart Tax Planning engine and AI Investment Intelligence engine.
 
 ---
 
-## PHASE 5 — INTELLIGENT ALERTS, APPROVAL WORKFLOW AND CONTROLLED ACTIONS
+## PHASE 5 — INTELLIGENT ALERTS, APPROVAL WORKFLOW, UNIFIED INTELLIGENCE AND CONTROLLED ACTIONS
 
 ### Objective
 
-Allow the AI agent to convert recommendations into proposed actions while ensuring that the user remains in control.
+Allow the AI agent to convert recommendations into proposed actions while ensuring that the user remains in control. Integrate tax planning and investment intelligence into the unified financial overview with cash-flow-aware guardrails.
 
 This phase introduces the approval-based autonomy model.
 
-### Notification System
+### Notification System (ORIGINAL)
 
 Implement:
 
@@ -756,7 +852,13 @@ Implement:
 6. Financial forecast alerts.
 7. Action status notifications.
 
-### Approval Management
+### Tax and Investment Notifications (ADDITION)
+
+- Tax filing reminders.
+- Investment alert notifications.
+- Fraud alert delivery (suspicious investment and UPI account alerts via notification centre).
+
+### Approval Management (ORIGINAL)
 
 The AI agent must be able to prepare an action proposal.
 
@@ -775,6 +877,13 @@ It prepares a proposal containing:
 - Supporting information.
 
 The user must explicitly approve or reject the proposal.
+
+### Extended Approval Management (ADDITION)
+
+- Tax regime change proposal (user approves switching tax regime; saved as preference).
+- Tax-saving investment proposal (propose Section 80C/80D investments; user approves recording).
+- Investment order proposal (read-only preparation of buy/sell order details; requires explicit per-order approval).
+- All extended proposals follow the same approval workflow with exact action detail validation.
 
 ### Approval Workflow
 
@@ -819,6 +928,13 @@ Implement:
 - Action audit records.
 - Duplicate execution protection.
 
+### Unified Financial Intelligence (ADDITION / IMPROVEMENT)
+
+- Integrate tax planning and investment intelligence with existing payment, budget, bill and subscription data.
+- Consider upcoming bills, subscriptions, dues, available balances and savings goals before suggesting investments (cash-flow-aware guardrails).
+- Avoid recommendations that could compromise the user's ability to meet upcoming financial obligations.
+- Provide a unified financial overview without compromising privacy.
+
 ### Agent Autonomy Rules
 
 The agent may:
@@ -839,6 +955,12 @@ The agent must not:
 - Execute an action based on ambiguous user instructions.
 - Claim an action has succeeded without provider confirmation.
 
+### Trading Restriction (ADDITION)
+
+- No actual trade execution in Phase 4 or Phase 5.
+- Trade execution requires regulatory, security and operational review before any future implementation.
+- Read-only order preparation only; no stored brokerage credentials that allow withdrawal or transfer.
+
 ### Frontend Screens
 
 - Notification centre.
@@ -847,6 +969,13 @@ The agent must not:
 - Approval confirmation.
 - Action history.
 - Notification settings.
+
+### Unified Overview and Tax/Investment Frontend Screens (ADDITION)
+
+- Unified dashboard: balance, upcoming bills, tax estimate, investment summary.
+- Tax regime change approval screen.
+- Investment order approval screen (read-only preparation).
+- Notification centre with tax/investment/fraud alert categories.
 
 ### Completion Criteria
 
@@ -857,6 +986,14 @@ The agent must not:
 - Duplicate actions are prevented.
 - All important actions are recorded.
 - Provider failures are communicated clearly.
+
+### Unified Intelligence and Tax/Investment Completion Criteria (ADDITION)
+
+- Investment suggestions respect upcoming bill obligations (cash-flow guardrail testing).
+- Tax regime change requires explicit approval.
+- Order proposals expire and cannot be executed after expiry.
+- Duplicate execution protection for tax/investment actions.
+- Unified dashboard displays correct aggregated cross-domain data.
 
 ### Expected Deliverable
 
@@ -870,7 +1007,7 @@ A functional approval-based financial agent with safe and controlled action mana
 
 Integrate all six-phase functionality into a reliable, secure and deployable product.
 
-### Testing
+### Testing (ORIGINAL)
 
 Implement:
 
@@ -888,7 +1025,15 @@ Implement:
 - Mobile application testing.
 - End-to-end testing.
 
-### Security
+### Tax and Investment Testing (ADDITION)
+
+- Tax calculation testing: boundary cases, regime comparison, Indian tax slabs, deductions, rebates.
+- Investment insight labeling verification: factual vs AI prediction vs recommendation labels.
+- Fraud detection false-positive testing: verify legitimate investments are not flagged.
+- Unified overview end-to-end testing: cross-domain data aggregation accuracy.
+- Regulatory disclaimer verification: verify disclaimers shown on all tax/investment screens.
+
+### Security (ORIGINAL)
 
 Implement:
 
@@ -903,6 +1048,13 @@ Implement:
 - Audit logging.
 - Dependency security checks.
 - Secure error handling.
+
+### Tax and Investment Security (ADDITION)
+
+- Tax and investment data isolation between users.
+- No API keys in frontend; server-side proxy for market data.
+- Audit logging for tax regime changes and investment order proposals.
+- Market data API failure handling with degraded mode and cached data.
 
 ### Docker
 
@@ -941,7 +1093,7 @@ Prepare:
 - Error monitoring.
 - Database backup strategy.
 
-### Documentation
+### Documentation (ORIGINAL)
 
 Maintain:
 
@@ -955,7 +1107,14 @@ Maintain:
 - Security documentation.
 - Deployment instructions.
 
-### Completion Criteria
+### Tax and Investment Documentation (ADDITION)
+
+- Tax rule version update procedure documentation.
+- Market data API evaluation criteria (cost, licensing, reliability).
+- Disclaimer content for all tax and investment screens.
+- Investment read-only preparation and trading restriction documentation.
+
+### Completion Criteria (ORIGINAL)
 
 - All six phases work together.
 - All critical tests pass.
@@ -964,6 +1123,13 @@ Maintain:
 - Database migrations work correctly.
 - The application is deployable.
 - Project documentation is complete.
+
+### Tax and Investment Completion Criteria (ADDITION)
+
+- Tax calculations match reference test cases.
+- Investment insights properly labeled in UI.
+- Unified dashboard displays correct aggregated data.
+- Disclaimers present on all tax/investment screens.
 
 ### Expected Deliverable
 
@@ -1026,7 +1192,9 @@ ai-payment-guardian/
 │   │   │   ├── ai/
 │   │   │   ├── approvals/
 │   │   │   ├── notifications/
-│   │   │   └── audit/
+│   │   │   ├── audit/
+│   │   │   ├── tax/
+│   │   │   └── investment/
 │   │   └── workers/
 │   ├── migrations/
 │   ├── tests/
@@ -1084,6 +1252,13 @@ Expected core entities:
 17. Executed actions.
 18. Notifications.
 19. Audit events.
+20. Tax rules (versioned, effective-dated Indian tax slabs, deductions, rebates, cess).
+21. Tax calculations (user tax estimates, regime used, assumptions).
+22. Tax regime preferences (user's selected tax regime).
+23. Investment insights (stock/gold/silver analysis, factual vs AI-labeled).
+24. Fraud alerts (suspicious investment and UPI account flags).
+25. Investment order proposals (read-only prepared orders, approval status).
+26. Tax saving investment records (user-recorded 80C/80D investments).
 
 Use appropriate foreign keys, indexes, constraints and timestamps.
 
@@ -1139,6 +1314,22 @@ Approvals:
 - POST /approvals/{id}/approve
 - POST /approvals/{id}/reject
 
+Tax:
+- POST /tax/calculate
+- GET /tax/regimes/compare
+- GET /tax/rules
+- POST /tax/regime-preference
+
+Investment:
+- GET /investment/stocks/analysis
+- GET /investment/gold-silver/prices
+- GET /investment/recommendations
+- GET /investment/fraud-alerts
+- POST /investment/order-proposals
+
+Unified:
+- GET /unified/overview
+
 Use appropriate HTTP methods, validation, authentication and error responses.
 
 Do not expose sensitive provider credentials through API responses.
@@ -1169,6 +1360,25 @@ The AI model must not independently modify database records or directly access f
 All data modification must pass through validated backend services.
 
 All financial calculations must be completed by the backend.
+
+### AI Agent Tools for Tax and Investment (ADDITION)
+
+The AI agent may use the following additional controlled tools:
+
+- `get_tax_estimate` — calculate estimated Indian income-tax (deterministic backend service).
+- `compare_tax_regimes` — compare old vs new tax regimes for the user.
+- `get_stock_analysis` — retrieve stock market analysis and insights.
+- `get_gold_silver_prices` — retrieve gold and silver market prices.
+- `get_investment_recommendations` — personalized investment suggestions.
+- `detect_investment_fraud` — flag suspicious investment opportunities.
+- `detect_suspicious_upi_account` — flag suspicious UPI accounts based on user's payment history.
+- `get_unified_overview` — retrieve unified financial summary across payments, tax and investments.
+
+All tax calculations are performed by deterministic backend services; the LLM may explain but never calculate tax.
+
+Market data tools distinguish factual data from AI predictions and recommendations through explicit labeling.
+
+No tool may execute trades or guarantee returns.
 
 The AI agent should be modular so that the LLM provider can be changed without rewriting the entire financial system.
 
@@ -1213,6 +1423,18 @@ Maintain consistent design components across both applications.
 
 Every screen must support appropriate loading, empty, success and error states.
 
+### Tax and Investment UI/UX (ADDITION)
+
+- Tax dashboard screen: regime comparison, estimated tax, tax-saving suggestions.
+- Investment screen: stock analysis, gold/silver tracker, personalized suggestions.
+- Factual vs AI-prediction vs recommendation labeling badges on all market data displays.
+- Disclaimers: no guaranteed returns, no trade execution without authorization, on all tax and investment screens.
+- Unified dashboard: balance, upcoming bills, tax estimate, investment summary.
+- Tax regime change approval screen.
+- Investment order approval screen (read-only preparation).
+
+The dashboard must not be overloaded with tax or investment charts; use secondary pages for detailed tax and investment analysis.
+
 ---
 
 # 12. SECURITY AND FINANCIAL SAFETY REQUIREMENTS
@@ -1235,6 +1457,12 @@ These requirements are mandatory throughout development.
 14. Never claim payment success without trusted confirmation.
 15. Clearly distinguish mock data from actual bank data.
 16. Clearly distinguish actual, pending and predicted financial values.
+17. Clearly distinguish factual market data, AI predictions and investment recommendations.
+18. Never guarantee investment returns.
+19. Never execute trades without explicit, per-order user authorization.
+20. Tax data is user-provided; never shared with third parties.
+21. Fraud detection is advisory; never silently blocks legitimate transactions.
+22. Investment suggestions must account for upcoming bills, subscriptions, dues, balances and savings goals.
 
 Security must not be postponed until Phase 6. Basic security must be implemented in every phase, with comprehensive hardening in Phase 6.
 
@@ -1498,6 +1726,11 @@ AI Payment Guardian will be considered successfully developed when:
 12. All important actions are recorded.
 13. The application is tested and secure.
 14. The complete application can be deployed.
+15. The Smart Tax Planning engine calculates Indian income-tax correctly for both old and new regimes.
+16. The AI Investment Intelligence engine distinguishes factual data, AI predictions and recommendations.
+17. Investment suggestions respect cash-flow guardrails (upcoming bills, subscriptions, dues, balances, savings goals).
+18. Fraud detection does not silently block legitimate transactions.
+19. No trades are executed without explicit per-order user authorization and regulatory review.
 
 ---
 
@@ -1537,6 +1770,14 @@ Everything in this section is **future scope**. None of it is implemented in
 Phases 1–3, and none of it changes the phase sequence above. It records the
 product direction so later phases are designed coherently rather than bolted
 on.
+
+Phases 4 and 5 introduce the foundational versions of several long-term
+vision capabilities: Smart Tax Planning (Indian income-tax), AI Investment
+Intelligence (stock market, gold and silver), fraud detection (suspicious
+investments and UPI accounts), and Unified Financial Intelligence. These
+are additions to the original Phase 4–5 roadmap and are clearly labeled
+as ADDITION throughout this document. The long-term vision below describes
+the eventual expansion beyond Phases 4–6.
 
 The long-term product expands AI Payment Guardian from a passive financial
 analyser into a guarded money assistant across banking, investments and
