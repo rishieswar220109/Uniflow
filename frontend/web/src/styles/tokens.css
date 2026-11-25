@@ -1,0 +1,95 @@
+:root {
+  color-scheme: light;
+
+  --font-sans:
+    'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-display:
+    'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+
+  --bg: #f4f7f4;
+  --bg-tint: rgba(12, 107, 86, 0.06);
+  --surface: #ffffff;
+  --surface-muted: #eef3ef;
+  --surface-inset: #f7faf8;
+  --text: #13221e;
+  --text-muted: #5b6f68;
+  --text-subtle: #7c8f88;
+  --border: #dbe4de;
+  --border-strong: #c3d1c9;
+
+  --primary: #0c6b56;
+  --primary-hover: #0a5947;
+  --primary-active: #084839;
+  --primary-soft: #e0f2eb;
+  --primary-soft-text: #095b4a;
+  --on-primary: #ffffff;
+
+  --accent: #a85a08;
+  --accent-soft: #fdf3de;
+  --danger: #b42318;
+  --danger-soft: #fee4e2;
+  --success: #067647;
+  --success-soft: #dcfae6;
+  --warning: #b54708;
+  --warning-soft: #fef0c7;
+
+  --shadow-xs: 0 1px 2px rgba(16, 40, 32, 0.05);
+  --shadow-sm:
+    0 1px 3px rgba(16, 40, 32, 0.06), 0 1px 2px rgba(16, 40, 32, 0.04);
+  --shadow-md:
+    0 10px 24px -12px rgba(16, 40, 32, 0.22),
+    0 2px 6px rgba(16, 40, 32, 0.04);
+  --shadow-lg:
+    0 28px 60px -28px rgba(9, 59, 47, 0.35),
+    0 8px 20px -12px rgba(9, 59, 47, 0.18);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --container: 1160px;
+  --nav-height: 74px;
+  --focus-ring: 0 0 0 4px rgba(12, 107, 86, 0.22);
+  --transition: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0b1512;
+  --bg-tint: rgba(64, 209, 159, 0.07);
+  --surface: #111e1a;
+  --surface-muted: #172722;
+  --surface-inset: #0e1a16;
+  --text: #e9f2ed;
+  --text-muted: #a2b4ad;
+  --text-subtle: #849790;
+  --border: #223630;
+  --border-strong: #2f4740;
+
+  --primary: #45d6a4;
+  --primary-hover: #63e2b5;
+  --primary-active: #86ecc6;
+  --primary-soft: #14362c;
+  --primary-soft-text: #8af0c9;
+  --on-primary: #04251c;
+
+  --accent: #f0b35b;
+  --accent-soft: #352816;
+  --danger: #ff9b92;
+  --danger-soft: #3a1a18;
+  --success: #6ce9a6;
+  --success-soft: #113225;
+  --warning: #f6c26a;
+  --warning-soft: #352713;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.34);
+  --shadow-md: 0 14px 30px -18px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 32px 70px -32px rgba(0, 0, 0, 0.85);
+  --focus-ring: 0 0 0 4px rgba(69, 214, 164, 0.24);
+}
